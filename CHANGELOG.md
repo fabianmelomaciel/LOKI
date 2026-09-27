@@ -2,6 +2,16 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.8.0] — 2026-09-27
+
+Indicador de progreso durante corridas `quick`/`standard`/`deep`: Loki imprime una línea de estado al empezar y cerrar cada fase con duración real, en vez de callar hasta el informe final. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — 1 hallazgo `bloqueante`: el canal de progreso no tenía regla de sanitización propia, a diferencia de `informe.html` que sí la exige explícitamente).
+
+### Added
+- Formato fijo de progreso (`SKILL.md` §FLUJO DE EJECUCIÓN, antes del paso 1): `⏳ Fase {n}/{total} — {nombre} — corriendo` / `✅ ... {resultado corto}` / `⏹ ... omitida ({motivo})`. Aplica a los pasos 6-10 (T0-pasivo/T0-activo/T1/T2/T3) — las fases sin duración real (gates, parseo, hash, informe) no imprimen línea aparte.
+- **Regla dura**: el contenido de la línea de progreso sale solo de metadata del orquestador (nombre de fase fijo, comando de `t0-commands.md`, conteos) — nunca texto crudo leído del target (mismo criterio de sanitización que ya exige `informe.html`, ahora extendido al canal de progreso). La línea de T0-activo (Gate D) se imprime recién después de la confirmación explícita, nunca antes ni junto al aviso del gate — evita que el indicador erosione la seriedad de la re-confirmación por fase.
+- `$spent_usd/$cap_usd` en las líneas de T1/T2/T3 (donde el budget realmente se mueve); omitido en T0-pasivo/T0-activo (siempre $0 LLM) para no generar ruido de "$0.00" engañoso.
+- README: mención breve del indicador; ítem sacado del roadmap.
+
 ## [1.7.0] — 2026-09-27
 
 Modo `--dry-run`: previsualizar qué correría Loki (comandos T0/T1/T2/T3 resueltos, gates pendientes) sin ejecutar nada. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — dos hallazgos `bloqueante`: riesgo de que el preview termine ejecutando algo real, y riesgo de que se use para saltear la re-confirmación de Gate D en la corrida siguiente). Ranking 1º A / 2º C / 3º B (B con hallazgos correctos pero mecanismo de mitigación propuesto —reducir `allowed-tools` dinámicamente por modo— no viable: el frontmatter es estático para toda la skill, así que la mitigación real es textual/estructural, no un sandbox técnico nuevo).
