@@ -24,6 +24,7 @@
           "poc": { "type": "string", "maxLength": 1000, "description": "Pasos/string ≤10 líneas, reproducible. Sin secretos vivos ni PII." },
           "snippet": { "type": "string", "maxLength": 800, "description": "≤10 líneas. Nunca dumps de archivos completos." },
           "tier": { "enum": ["t0-pasivo", "t0-activo", "t1", "t2", "t3"] },
+          "alcance": { "enum": ["prod", "dev", "ambos"], "description": "Alcance real según contexto dev/prod (.gitignore, devDependencies, pipeline de deploy). prod/ambos priorizados en el informe — ver references/dev-vs-prod.md." },
           "evidence_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
           "status": { "enum": ["new", "confirmed", "rejected_fp", "fixed"] }
         }

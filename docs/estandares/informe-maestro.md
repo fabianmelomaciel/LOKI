@@ -1,6 +1,8 @@
 # Loki — Plantilla de Informe Maestro (español)
 
 > Copiar esta plantilla a `reports/<fecha>-<target>/informe.md` y rellenar. Estructura fija — no reordenar secciones. Todo hallazgo necesita PoC reproducible o se descarta.
+> **Cierre obligatorio (SKILL.md paso 12):** generar `informe.html` desde `templates/informe.html` (contenido HTML-escapado) y abrirlo en el navegador default del SO — imprimir siempre el link `file:///`.
+> **Priorización (ver `references/dev-vs-prod.md`):** §3 ordena **producción primero** — `alcance: prod/ambos` antes que `dev`, duda → prod.
 
 ```markdown
 # 🔐 Informe de Auditoría — Loki
@@ -28,9 +30,10 @@
 | Secretos redactados / PII placeholder (check sí) | |
 
 ## 3. Hallazgos por severidad
-{Para cada hallazgo:}
+{Orden: **prod/ambos primero**, dev al final (severidad intacta — solo cambia el orden). Para cada hallazgo:}
 ### [{SEVERIDAD}] {Título} — {CWE-XX / OWASP A0X / ISO27001 {control}}
 - **Ubicación:** {file:line o endpoint}
+- **Alcance:** {prod | dev | ambos} — {"afecta producción" si prod/ambos; si es solo-dev y de severidad alta/crítica, declararlo explícito en §1}
 - **Norma:** CWE-XX · OWASP A0X · **ISO/IEC 27001:2022 {control Annex A}** (obligatorio — ver `references/iso27001-mapping.md`) · MITRE si aplica
 - **Descripción:** {qué está mal y por qué importa}
 - **PoC (reproducible):** {request/comando/pasos exactos}

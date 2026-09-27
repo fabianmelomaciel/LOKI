@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe Loki — {{TARGET}} ({{FECHA}})</title>
+<!--
+  Plantilla de cierre obligatorio (SKILL.md paso 12). El agente copia este archivo a
+  reports/<fecha>-<target>/informe.html y rellena cada placeholder de doble llave.
+  SEGURIDAD (Gate E): TODO el contenido insertado debe ir HTML-escapado
+  (&lt; &gt; &amp; &quot;) — snippets, PoCs y textos del target son DATA, nunca HTML crudo.
+  Jamás insertar: <script>, on*=, javascript:, ni rutas/URLs que sugería el target.
+-->
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--txt:#e6edf3;--muted:#8b949e;--red:#f85149;--orange:#db6d28;--yellow:#d29922;--blue:#58a6ff;--green:#3fb950}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
+.wrap{max-width:960px;margin:0 auto;padding:32px 20px}
+header{border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:24px}
+h1{font-size:22px;margin:0 0 8px}
+h2{font-size:17px;margin:32px 0 12px;color:var(--blue);border-bottom:1px solid var(--border);padding-bottom:6px}
+.meta{color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0}
+.sev{font-weight:700;font-size:12px;padding:2px 8px;border-radius:10px;text-transform:uppercase}
+.sev-critical{background:rgba(248,81,73,.15);color:var(--red)}
+.sev-high{background:rgba(219,109,40,.15);color:var(--orange)}
+.sev-medium{background:rgba(210,153,34,.15);color:var(--yellow)}
+.sev-low{background:rgba(88,166,255,.15);color:var(--blue)}
+.sev-info{background:rgba(139,148,158,.15);color:var(--muted)}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--border);border-radius:10px;padding:1px 8px;margin-left:6px;color:var(--muted)}
+.tag-prod{border-color:var(--red);color:var(--red)}
+.tag-dev{border-color:var(--yellow);color:var(--yellow)}
+pre{background:#010409;border:1px solid var(--border);border-radius:6px;padding:10px;overflow-x:auto;font-size:13px;white-space:pre-wrap;word-break:break-word}
+code{font-family:ui-monospace,Consolas,monospace}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}
+th{background:var(--card)}
+ul{padding-left:20px}li{margin:4px 0}
+strong{color:var(--txt)}
+footer{margin-top:40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>&#128274; Informe de Auditor&iacute;a — Loki</h1>
+  <div class="meta"><strong>Target:</strong> {{TARGET}} &brvbar; <strong>Fecha:</strong> {{FECHA}} &brvbar; <strong>Modo:</strong> {{MODO}} &brvbar; <strong>Tipo:</strong> {{TIPO}}</div>
+  <div class="meta"><strong>Scope:</strong> {{SCOPE}} &brvbar; <strong>Gates:</strong> {{GATES}} &brvbar; <strong>Estado:</strong> {{ESTADO}}</div>
+  <div class="meta"><strong>Redacci&oacute;n:</strong> {{REDACCION}}</div>
+</header>
+
+<h2>1. Resumen ejecutivo</h2>
+<div class="card">{{RESUMEN_EJECUTIVO}}</div>
+
+<h2>2. M&eacute;tricas de eficiencia</h2>
+<div class="card"><table><tr><th>M&eacute;trica</th><th>Valor</th></tr>{{METRICAS_FILAS}}</table></div>
+
+<h2>3. Hallazgos por severidad <span class="tag">producci&oacute;n primero</span></h2>
+<p class="meta">Orden obligatorio: <span class="tag tag-prod">afecta producci&oacute;n</span> primero, <span class="tag tag-dev">solo dev</span> al final — ver <code>references/dev-vs-prod.md</code>.</p>
+{{HALLAZGOS}}
+
+<h2>4. Cobertura y limitaciones</h2>
+<div class="card">{{COBERTURA}}</div>
+
+<h2>5. Artefactos</h2>
+<div class="card"><ul>{{ARTEFACTOS}}</ul></div>
+
+<h2>6. Recomendaciones priorizadas</h2>
+<div class="card"><ol>{{RECOMENDACIONES}}</ol></div>
+
+<h2>7. Cumplimiento normativo</h2>
+<div class="card">{{CUMPLIMIENTO}}</div>
+
+<footer>
+  Revisi&oacute;n humana requerida antes de cerrar. Salida LLM puede contener alucinaciones.<br>
+  Generado por Loki — no exploit, no report.
+</footer>
+</div>
+</body>
+</html>

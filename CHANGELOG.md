@@ -2,6 +2,20 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.3.0] — 2026-09-27
+
+Cierre de informe en navegador + priorización dev/prod de hallazgos. Decisión del CEO (patrón SkillGrid).
+
+### Added
+- **`templates/informe.html`**: dashboard HTML del informe (resumen, métricas, hallazgos con severidad/alcance/POC/remediación, cobertura, artefactos, recomendaciones, cumplimiento) — **cierre obligatorio**: se genera junto al `.md` y se abre en el **navegador default del SO** (Windows `start` · Linux `xdg-open` · macOS `open`, patrón `skills/shared/open-report.md` de SkillGrid), fallo silencioso sin GUI y **siempre** se imprime el link `file:///`. Gate E: solo contenido HTML-escapado y solo la ruta propia bajo `reports/` — jamás una ruta/URL sugerida por el target.
+- **`references/dev-vs-prod.md`**: análisis dev vs producción por hallazgo — lectura de `.gitignore` (qué es dev-only vs desplegable), `devDependencies`, config/debug, pipeline de deploy; checklist y **regla de priorización: los hallazgos que afectan PRODUCCIÓN van primero** (`alcance: prod/dev/ambos`, duda → prod).
+- **Campo `alcance`** (opcional, additivo) en `vulnerabilities.schema.json`.
+- allowed-tools: 3 entradas estrechas de cierre (`start/xdg-open/open file:///*`) — sin tocar las prohibiciones inmutables (pwsh/npx/npm).
+
+### Changed
+- Flujo de SKILL.md: Fase 1 detecta entorno dev/prod; Fase 4 asigna `alcance` y ordena prod-first; paso 12 genera `informe.html` y lo abre en el navegador.
+- `docs/estandares/informe-maestro.md`: campo `**Alcance:**` por hallazgo, orden prod-first en §3 y nota de cierre HTML.
+
 ## [1.2.0] — 2026-09-27
 
 Slash-command unificado `/loki` interactivo + soporte Gemini CLI + cumplimiento normativo mundial. Decisión del CEO.

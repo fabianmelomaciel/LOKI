@@ -179,7 +179,10 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 
-## Mejoras recientes (v1.1.0 → v1.2.0): normas, leyes y cumplimiento mundial
+## Mejoras recientes (v1.1.0 → v1.3.0): normas, leyes y cumplimiento mundial
+
+- **Cierre en navegador (v1.3.0)**: el informe final se genera también como `informe.html` (`templates/informe.html`, contenido escapado Gate E) y se abre solo en el **navegador default del SO** (Windows/Linux/macOS, patrón SkillGrid) — siempre con el link `file:///` de respaldo.
+- **Priorización dev/prod (v1.3.0)**: cada hallazgo se clasifica con `alcance: prod/dev/ambos` analizando `.gitignore`, `devDependencies` y pipeline de deploy (`references/dev-vs-prod.md`) — **lo que afecta producción va primero** en el informe.
 
 - **`/loki` interactivo**: sin argumentos detecta tu contexto (¿repo git y su origin?, ¿stack?, ¿URL/ruta/IP?) y ofrece menú de opciones — pentest completo (postura ofensiva tipo hack-audit/Strix/Shannon), `scan`, `quick`, `standard`, `deep`, `hack-audit`, estático, ayuda y cancelar. Con argumento arranca directo. Disponible en **opencode, Claude Code y Gemini CLI** (`.gemini/commands/*.toml`), instalado/desinstalado/verificado por ambos instaladores.
 - **Informe listo para reparar**: cada hallazgo exige `remediation` concreto + PoC reproducible (schema obligatorio).
