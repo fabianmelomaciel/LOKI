@@ -3,12 +3,13 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.6.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.6.1-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-6b46c1)](#-funciona-en-tu-ai-ide-ya)
 [![OpenCode](https://img.shields.io/badge/OpenCode-compatible-2ea44f)](#-funciona-en-tu-ai-ide-ya)
+[![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-compatible-4285f4)](#-funciona-en-tu-ai-ide-ya)
 [![ISO 27001](https://img.shields.io/badge/ISO%2027001-mapeo%20nativo-005571)](references/iso27001-mapping.md)
 [![PRs welcome](https://img.shields.io/badge/PRs-bienvenidas-orange)](CONTRIBUTING.md)
 
@@ -21,7 +22,7 @@
 
 ## ¿Qué es esto?
 
-Loki es una **skill** (formato `SKILL.md`, el estándar que ya leen Claude Code, OpenCode y Cursor) que convierte a tu agente de IA en un orquestador de pentesting real: escanea con herramientas gratuitas primero, escala a razonamiento profundo solo donde importa, y **nunca** reporta un hallazgo sin prueba de concepto reproducible.
+Loki es una **skill** (formato `SKILL.md`, el estándar que ya leen Claude Code, OpenCode, Gemini CLI y — con cobertura reducida, sin shell real — Cursor) que convierte a tu agente de IA en un orquestador de pentesting real: escanea con herramientas gratuitas primero, escala a razonamiento profundo solo donde importa, y **nunca** reporta un hallazgo sin prueba de concepto reproducible.
 
 No reinventa escáneres. Orquesta Semgrep, Trivy, Gitleaks, TruffleHog, Checkov, Bandit, nmap, nuclei, ffuf y (opcional) [Strix](https://github.com/usestrix/strix) — con el gate de autorización que [Shannon](https://github.com/KeygraphHQ/shannon) popularizó, pero sin pedirte Docker.
 
@@ -43,7 +44,7 @@ Esto no es letra chica al final del README. Es la razón por la que existe: cual
 | Corre gratis antes de gastar tokens | ❌ | N/A | ✅ T0 cubre ≥70% de hallazgos a $0 |
 | Exige PoC para reportar | ❌ (alucina) | Depende del pentester | ✅ "no exploit, no report" |
 | Informe con métricas de costo | ❌ | ❌ | ✅ findings/USD, %T0, tendencia |
-| Funciona igual en Claude Code / OpenCode / Cursor | ❌ | ❌ | ✅ un solo `SKILL.md` |
+| Funciona igual en Claude Code / OpenCode / Gemini CLI | ❌ | ❌ | ✅ un solo `SKILL.md` |
 | Rate-limit y guard anti auto-daño incorporados | ❌ | Manual | ✅ ≤5 req/s, host-check |
 | Memoria entre corridas (no re-escanea sin cambios) | ❌ | ❌ | ✅ cache por hash de contenido, TTL 24h — ver [`references/cache.md`](references/cache.md) |
 
@@ -111,6 +112,8 @@ Instaladores multiplataforma: `install.sh` (Linux/macOS/BSD/WSL — POSIX puro) 
 
 El instalador detecta qué herramientas T0 tenés disponibles e imprime la **matriz de cobertura real** — lo que falta se declara en el informe, nunca se oculta.
 
+Además de la skill, el instalador copia los comandos `/loki` (menú interactivo) y `/loki-scan` (atajo directo a modo `scan`, $0, sin LLM) a la carpeta de slash-commands de cada engine — por eso el repo trae `.claude/commands/`, `.opencode/commands/` y `.gemini/commands/`: son la fuente de esos comandos, **indispensables**, no basura de desarrollo (ver `## Estructura` más abajo).
+
 ## La cascada: gratis primero, IA solo donde rinde
 
 | Tier | Motor | Costo | Gates requeridos |
@@ -144,6 +147,9 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 
 ```
 ├── SKILL.md                # skill maestra (gates + routing + tiers)
+├── .claude/commands/         # slash-commands /loki + /loki-scan para Claude Code (indispensable, copiado por install)
+├── .opencode/commands/        # mismos comandos para OpenCode (indispensable, copiado por install)
+├── .gemini/commands/           # mismos comandos para Gemini CLI, formato .toml (indispensable, copiado por install)
 ├── AGENTS.md                # reglas inmutables para contributors
 ├── CONTRIBUTING.md           # guía de PR para contributors externos
 ├── docs/normas/              # ético, gates, alcance, evidencias, legal
@@ -195,7 +201,7 @@ Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienv
 
 ## Historial de versiones
 
-Cada versión, qué cambió y por qué está en [`CHANGELOG.md`](CHANGELOG.md) (formato Keep a Changelog). Highlights recientes: guard multi-repo para no mezclar proyectos distintos en un informe (v1.4.0), salida `fix_snippet` para que un IDE con IA repare hallazgos directo desde `vulnerabilities.json` (v1.5.0), cierre automático en navegador + priorización dev/prod (v1.3.0), `/loki` interactivo multi-engine + cumplimiento normativo mundial (v1.2.0).
+Cada versión, qué cambió y por qué está en [`CHANGELOG.md`](CHANGELOG.md) (formato Keep a Changelog). Highlights recientes: banner de motor/SO + lista de tareas antes de ejecutar (v1.6.0), salida `fix_snippet` para que un IDE con IA repare hallazgos directo desde `vulnerabilities.json` (v1.5.0), guard multi-repo para no mezclar proyectos distintos en un informe (v1.4.0), cierre automático en navegador + priorización dev/prod (v1.3.0).
 
 ## Contribuir
 

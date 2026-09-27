@@ -2,6 +2,15 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.1] — 2026-09-27
+
+Alineación de README tras auditoría de repo-hygiene (consejo `agente-ideas`, pregunta del CEO: "¿`.opencode`/`.gemini` son indispensables en GitHub? ¿el README está alineado? ¿qué le falta a la herramienta?"). Confirmado: los 3 directorios son indispensables (fuente de los slash-commands `/loki`/`/loki-scan`, copiados por `install.ps1`/`install.sh`) — no se tocaron. Se corrigió que el README nunca lo explicaba.
+
+### Fixed
+- README nunca mencionaba `/loki-scan` (existe desde v1.2.0, wrapper directo a modo `scan` gratis) ni explicaba para qué son `.claude/`, `.opencode/`, `.gemini/` en `## Estructura` — un visitante nuevo podía asumir que eran basura de desarrollo y borrarlos.
+- README mencionaba "Claude Code, OpenCode y Cursor" como si fueran equivalentes (párrafo intro y tabla comparativa "Frente al resto"), mientras la tabla de compatibilidad real ya distinguía a Cursor como "cobertura reducida" — inconsistencia entre secciones del mismo archivo. Ahora el texto refleja lo mismo que la tabla; Gemini CLI (ya first-class desde v1.6.0) agregado donde faltaba, incluyendo badge.
+- "Historial de versiones" no mencionaba el highlight de v1.6.0.
+
 ## [1.6.0] — 2026-09-27
 
 Conciencia de motor/SO en el menú interactivo: Loki ahora declara qué engine lo ejecuta y qué sistema operativo detectó antes de correr nada, y muestra la lista concreta de tareas que va a hacer. Deliberación `agente-ideas` (consejo A/B/C, veto de seguridad B — sin early-exit, ranking B>C>A), pedido del CEO ("debe entender que ide usa... consciente de esto... menú de preguntas claro e intuitivo... listar las tareas que va a realizar en pantalla").
