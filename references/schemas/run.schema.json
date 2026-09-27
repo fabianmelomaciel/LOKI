@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["version", "status", "mode", "targets", "started_at", "llm_usage"],
   "properties": {
-    "version": { "type": "string", "const": "1.1.0" },
+    "version": { "type": "string", "const": "1.0.0" },
     "status": { "enum": ["completed", "stopped_budget", "stopped_turns", "stopped_error", "coverage_partial", "blocked_gate"] },
     "mode": { "enum": ["quick", "standard", "deep"] },
     "target_type": { "enum": ["codigo", "red", "equipo", "completo"] },

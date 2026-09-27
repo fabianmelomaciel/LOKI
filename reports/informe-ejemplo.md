@@ -27,9 +27,9 @@ La aplicación presenta un hallazgo crítico de inyección SQL en el endpoint de
 
 ## 3. Hallazgos por severidad
 
-### [critical] SQL Injection en búsqueda — CWE-89 / OWASP A03
+### [critical] SQL Injection en búsqueda — CWE-89 / OWASP A03 / ISO27001 A.8.28
 - **Ubicación:** `src/search.js:42`
-- **Norma:** CWE-89, OWASP A03:2021
+- **Norma:** CWE-89 · OWASP A03:2021 · **ISO/IEC 27001:2022 A.8.28** (codificación segura)
 - **Descripción:** Concatenación de input de usuario en query SQL sin parametrizar.
 - **PoC (reproducible):**
   ```

@@ -1,6 +1,6 @@
 ---
 name: loki
-version: 1.2.0
+version: 1.0.0
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
@@ -145,7 +145,7 @@ Estimado: quick ≤5 min (~$0.10) │ standard ~30 min (~$2) │ deep horas (cap
 |-----------|----------------|----------------------|
 | Auditoría estática 12 categorías | `auditor-de-seguridad` | nombre → `$SKILLGRID` → `../SkillGrid/skills/auditor-de-seguridad/SKILL.md` → ruta absoluta local |
 | SCA/SAST/secretos/IaC | `cyber-neo` | nombre → `$SKILLGRID` → `../SkillGrid/skills/cyber-neo/SKILL.md` → absoluta |
-| Explotación real local/red | `hack-audit` | nombre → `$SKILLGRID` → `../SkillGrid/skills/hack-audit/SKILL.md` → absoluta |
+| Explotación real local/red | `hack-audit` (analizado y validado — no duplica auditor-de-seguridad/cyber-neo, ver `CODEX.md`) | nombre → `$SKILLGRID` → `../SkillGrid/skills/hack-audit/SKILL.md` → absoluta. **Ajustes obligatorios al invocar:** (1) inyectar `rate_limit: ≤5 req/s, backoff exponencial 1s→30s, máx 3 intentos` en el prompt (hack-audit no lo trae por defecto); (2) sus hallazgos pasan por T2-verify para completar `cwe`+`iso27001` antes de escribir `vulnerabilities.json` (su plantilla nativa no los incluye) |
 | Corregir→re-auditar | `audit-loop` | nombre → `$SKILLGRID` → `../SkillGrid/skills/audit-loop/SKILL.md` → absoluta |
 | Cadena de suministro | `supply-chain-auditor` | nombre → `$SKILLGRID` → `../SkillGrid/skills/supply-chain-auditor/SKILL.md` → absoluta |
 | Prompts/IA | `prompt-injection-guard` | nombre → `$SKILLGRID` → `../SkillGrid/skills/prompt-injection-guard/SKILL.md` → absoluta |
@@ -172,7 +172,7 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 6. **Fase 2 — T0-pasivo:** lanzar en paralelo los escaneos de lectura (`references/t0-commands.md`; `which` primero; ausentes → listar en informe). **Append** a `.loki/audit-log.jsonl`: `{ts, phase:"t0-pasivo", gates:"A,B,E", commands:[...]}`.
 7. **Gate D (transición a activo)** → si el modo lo requiere y C está completo, re-confirmar con el usuario. **T0-activo:** nuclei/nmap/ffuf/nikto/curl con rate ≤5 req/s. Append audit-log con `gates:"A,B,C,D,E"`.
 8. **Fase 3 — T1 triage:** subagentes baratos (prompt de `references/dispatch.md`, gates verbatim) deduplican → `vulnerabilities.json` según `references/schemas/vulnerabilities.schema.json`. Append audit-log.
-9. **Fase 4 — T2 verificación:** todo `critical`/`high` pasa por razonamiento profundo (prompt T2-verify). Actualizar budget `spent_usd`.
+9. **Fase 4 — T2 verificación:** todo `critical`/`high` pasa por razonamiento profundo (prompt T2-verify). Hallazgos de `hack-audit` (sin `cwe`/`iso27001` nativo) se completan acá contra `references/iso27001-mapping.md` antes de escribir `vulnerabilities.json`. Actualizar budget `spent_usd`.
 10. **(si `deep`) Fase 5 — T3:** explotación con Gates C+D re-confirmados + pin de Strix. Importar/dedup hallazgos externos.
 11. **Hash de evidencias:** `sha256sum` de cada evidencia → `run.json` (custodia, ver `EVIDENCIAS.md`).
 12. **Informe:** generar con `docs/estandares/informe-maestro.md` en `reports/<fecha>-<target>/`; correr `scripts/metrics.ps1` para findings/USD y %T0; append a `reports/index.jsonl` `{date,target,cost_usd,findings_pct_t0,findings_total}`.
@@ -203,13 +203,14 @@ Siempre incluir, además de hallazgos con PoC y severidad (crítico→info):
 ├─ cobertura: archivos escaneados/total, fases completadas vs omitidas
 ├─ matriz de herramientas T0 disponibles/faltantes
 ├─ tendencia vs corridas previas (reports/index.jsonl)
+├─ % hallazgos con control ISO/IEC 27001 Annex A asignado (objetivo 100% — ver `references/iso27001-mapping.md`)
 └─ Secretos: [x] placeholders │ PII: [x] minimizada (checklist de redacción)
 ```
 
 Formato de salida por corrida en `reports/<fecha>-<target>/`:
-- `informe.md` — reporte ejecutivo (español, plantilla maestra).
-- `vulnerabilities.json` — según `references/schemas/vulnerabilities.schema.json`.
-- `findings.sarif` — SARIF 2.1.0 cuando los motores lo emitan.
+- `informe.md` — reporte ejecutivo (español, plantilla maestra). Cada hallazgo lleva CWE + OWASP + **control ISO 27001 Annex A obligatorio**.
+- `vulnerabilities.json` — según `references/schemas/vulnerabilities.schema.json` (campo `iso27001` requerido).
+- `findings.sarif` — SARIF 2.1.0 cuando los motores lo emitan (siempre que el motor lo soporte: Semgrep/Trivy/Nuclei lo emiten nativo; convertir T1/T2 al mismo formato cuando el motor no lo trae, para interoperabilidad CI/CD).
 - `run.json` — según `references/schemas/run.schema.json` (incluye `llm_usage`, `findings_by_phase`, hashes de evidencia, ref Strix si aplica).
 
 Nunca incluir secretos vivos ni PII en claro en el informe.
@@ -218,4 +219,6 @@ Nunca incluir secretos vivos ni PII en claro en el informe.
 
 ## CUMPLIMIENTO NORMATIVO
 
-Mapear cada hallazgo con `docs/estandares/checklist.md`: OWASP Top 10 (2025), CWE Top 25, OWASP ASVS, OWASP LLM Top 10, MITRE ATT&CK, NIST SP 800-115 / CSF 2.0, ISO 27001:2022 Annex A, PTES/OWASP WSTG. Ética y legal: `docs/normas/`.
+Mapear cada hallazgo con `docs/estandares/checklist.md`: OWASP Top 10 (2025), CWE Top 25, OWASP ASVS, OWASP LLM Top 10, MITRE ATT&CK, NIST SP 800-115 / CSF 2.0, PTES/OWASP WSTG. Ética y legal: `docs/normas/`.
+
+**ISO/IEC 27001:2022 Annex A es obligatorio, no opcional:** todo hallazgo lleva un control Annex A en el campo `iso27001` (tabla de mapeo en `references/iso27001-mapping.md`). Es el diferenciador de Loki frente a otros agentes de pentesting con IA (Strix, Shannon, CAI) — ninguno lo hace nativo en su capa open source.

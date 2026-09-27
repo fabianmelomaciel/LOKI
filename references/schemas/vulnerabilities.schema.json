@@ -4,16 +4,17 @@
   "type": "object",
   "required": ["version", "findings"],
   "properties": {
-    "version": { "type": "string", "const": "1.1.0" },
+    "version": { "type": "string", "const": "1.0.0" },
     "findings": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "severity", "cwe", "file", "finding", "remediation", "poc"],
+        "required": ["id", "severity", "cwe", "iso27001", "file", "finding", "remediation", "poc"],
         "properties": {
-          "id": { "type": "string", "pattern": "^EH-[0-9]{3,}$" },
+          "id": { "type": "string", "pattern": "^LK-[0-9]{3,}$" },
           "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
           "cwe": { "type": "string", "pattern": "^CWE-[0-9]+$" },
+          "iso27001": { "type": "string", "pattern": "^A\\.(5|6|7|8)\\.[0-9]{1,2}$", "description": "Control ISO/IEC 27001:2022 Annex A mapeado (ej. A.8.8 gestión de vulnerabilidades técnicas)." },
           "owasp": { "type": "string" },
           "file": { "type": "string" },
           "line": { "type": "integer" },

@@ -29,9 +29,9 @@
 
 ## 3. Hallazgos por severidad
 {Para cada hallazgo:}
-### [{SEVERIDAD}] {Título} — {CWE-XX / OWASP A0X}
+### [{SEVERIDAD}] {Título} — {CWE-XX / OWASP A0X / ISO27001 {control}}
 - **Ubicación:** {file:line o endpoint}
-- **Norma:** {mitre/owasp/cwe/iso según checklist.md}
+- **Norma:** CWE-XX · OWASP A0X · **ISO/IEC 27001:2022 {control Annex A}** (obligatorio — ver `references/iso27001-mapping.md`) · MITRE si aplica
 - **Descripción:** {qué está mal y por qué importa}
 - **PoC (reproducible):** {request/comando/pasos exactos}
 - **Impacto:** {qué puede lograr un atacante}

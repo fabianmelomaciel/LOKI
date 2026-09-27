@@ -2,12 +2,16 @@
 
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
+[![Version](https://img.shields.io/badge/versión-1.0.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-6b46c1)](#-funciona-en-tu-ai-ide-ya)
 [![OpenCode](https://img.shields.io/badge/OpenCode-compatible-2ea44f)](#-funciona-en-tu-ai-ide-ya)
+[![ISO 27001](https://img.shields.io/badge/ISO%2027001-mapeo%20nativo-005571)](references/iso27001-mapping.md)
 [![PRs welcome](https://img.shields.io/badge/PRs-bienvenidas-orange)](AGENTS.md)
+
+*Creado y mantenido por **Lic. Fabián Melo**.*
 
 > Le pedís "auditá este proyecto" a tu copiloto de IA y te devuelve una alucinación con formato de informe.
 > Loki le pone **gates, tiers de costo y PoC obligatoria** al medio. Sin eso, no es auditoría — es fan-fiction con markdown.
@@ -40,6 +44,20 @@ Esto no es letra chica al final del README. Es la razón por la que existe: cual
 | Informe con métricas de costo | ❌ | ❌ | ✅ findings/USD, %T0, tendencia |
 | Funciona igual en Claude Code / OpenCode / Cursor | ❌ | ❌ | ✅ un solo `SKILL.md` |
 | Rate-limit y guard anti auto-daño incorporados | ❌ | Manual | ✅ ≤5 req/s, host-check |
+
+## Frente al resto del ecosistema
+
+No estamos solos en esto, y no pretendemos serlo. Estas son las referencias que existen hoy — y en qué se apoya Loki de cada una, sin copiarlas:
+
+| Proyecto | Qué aporta | Qué le falta (que Loki sí trae) |
+|---|---|---|
+| [**Strix**](https://github.com/usestrix/strix) (~32.8k★) | Agentes de explotación real, "no exploit no report" | Sin cascada de costo T0→T3, sin mapeo normativo nativo |
+| [**Shannon**](https://github.com/KeygraphHQ/shannon) | Gate de autorización, 5 fases estilo OWASP | Requiere Docker; no corre nativo dentro del IDE |
+| **CAI** (Cybersecurity AI) | Framework de agentes para CTF/red-team | Enfocado en investigación, no en informes de compliance |
+| **PentestGPT** | Guía de pentest conversacional sobre un LLM | Sin ejecución real de herramientas, sin PoC obligatoria |
+| **Loki** | Todo lo anterior combinado en un `SKILL.md` portable | — |
+
+**Lo que nadie más trae de fábrica:** mapeo obligatorio a **ISO/IEC 27001:2022 Annex A** por cada hallazgo (no como anexo opcional, sino como campo requerido en el schema — ver [`references/iso27001-mapping.md`](references/iso27001-mapping.md)), además de CWE Top 25, OWASP Top 10/ASVS/WSTG/LLM Top 10, MITRE ATT&CK/ATLAS, NIST SP 800-115/CSF 2.0 y PTES en el mismo informe. Salida en **SARIF 2.1.0** para integrarlo directo a tu pipeline de CI/CD.
 
 ## 🧩 Funciona en tu AI IDE, ya
 
@@ -135,6 +153,16 @@ OWASP Top 10 (2025) · CWE Top 25 · OWASP ASVS · OWASP LLM Top 10 · PTES · O
 - Uso **únicamente** con autorización del propietario — [`docs/normas/LEGALES.md`](docs/normas/LEGALES.md), [`LICENSE`](LICENSE) (MIT + cláusula *authorized-use only*).
 - ¿Encontraste una vulnerabilidad en Loki mismo? Divulgación responsable en [`SECURITY.md`](SECURITY.md).
 - Reglas inmutables para quien contribuye: [`AGENTS.md`](AGENTS.md).
+
+## Roadmap (honesto: lo que falta)
+
+Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC), y delega explotación real a `hack-audit`. Lo que **todavía no existe** y está planeado, para no venderte algo que no hace:
+
+- [ ] Agentes especializados de *host-hardening* por SO: revisión de registro/servicios en Windows, `systemd`/permisos en Linux, `launchd`/entitlements en macOS.
+- [ ] Reglas dedicadas de auditoría de red interna contra un servidor propio (más allá de nmap/nuclei genéricos ya soportados en T0-activo).
+- [ ] Integración opcional de Shannon sin requerir Docker.
+
+Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 
 ## Contribuir
 

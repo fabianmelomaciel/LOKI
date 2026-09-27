@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = "Stop"
 $Src = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillName = "loki"
-$SkillVersion = "1.2.0"
+$SkillVersion = "1.0.0"
 
 $DestRoots = @()
 if ($Target -eq "all" -or $Target -eq "opencode") {

@@ -17,7 +17,7 @@ done
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 SKILL_NAME="loki"
-SKILL_VERSION="1.2.0"
+SKILL_VERSION="1.0.0"
 
 # Lista canónica (sync con install.ps1)
 FILE_LIST="SKILL.md README.md LICENSE SECURITY.md docs references templates scripts"
