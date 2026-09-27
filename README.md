@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.6.5-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.7.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -131,6 +131,8 @@ Además de la skill, el instalador copia los comandos `/loki` (menú interactivo
 | `standard` | ~30 min | $2 | + T0-activo + subagentes en paralelo |
 | `deep` | horas | $10 hard cap | + Strix / explotación real |
 
+Cualquier modo acepta `--dry-run`: corre la Fase 1 (recon, stack, scope) y lista los comandos T0/T1/T2/T3 que correría, sin ejecutar nada — $0, ningún gate D queda satisfecho por el preview.
+
 *(ejemplo real de una corrida `quick`: 3 hallazgos, $0.06, 100% detectado en T0 gratis → 50 findings/USD. Ver [`reports/informe-ejemplo.md`](reports/informe-ejemplo.md).)*
 
 ## Los 5 gates (por qué esto no es un juguete)
@@ -196,7 +198,6 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 - [ ] Integración opcional de Shannon sin requerir Docker.
 - [ ] Benchmark publicado (metodología ya definida en [`docs/BENCHMARK.md`](docs/BENCHMARK.md), falta la corrida real contra Juice Shop/DVWA).
 - [ ] Demo visual embebida (instrucciones listas en [`docs/DEMO.md`](docs/DEMO.md), falta grabarla).
-- [ ] Modo `--dry-run`: previsualizar qué comandos T0/T1/T2 se ejecutarían para el alcance dado, sin correr nada, para revisar antes de autorizar los gates.
 - [ ] Indicador de progreso durante corridas `standard`/`deep`: hoy una corrida larga no muestra en qué fase/comando está mientras corre, solo el informe final.
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 

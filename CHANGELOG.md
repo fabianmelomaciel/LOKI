@@ -2,6 +2,16 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.7.0] — 2026-09-27
+
+Modo `--dry-run`: previsualizar qué correría Loki (comandos T0/T1/T2/T3 resueltos, gates pendientes) sin ejecutar nada. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — dos hallazgos `bloqueante`: riesgo de que el preview termine ejecutando algo real, y riesgo de que se use para saltear la re-confirmación de Gate D en la corrida siguiente). Ranking 1º A / 2º C / 3º B (B con hallazgos correctos pero mecanismo de mitigación propuesto —reducir `allowed-tools` dinámicamente por modo— no viable: el frontmatter es estático para toda la skill, así que la mitigación real es textual/estructural, no un sandbox técnico nuevo).
+
+### Added
+- **Modo `--dry-run`** (`SKILL.md` §PARSEO DE INTENCIÓN punto 5, §FLUJO paso 5.5): flag ortogonal al tier. Corre Gates A+B+E + Fase 1 recon real (necesaria para un preview útil: stack, scope, tier), después **STOP** — lista comandos T0-pasivo/T0-activo resueltos desde `.loki/tools-cache.json` (si el cache venció, lo declara en vez de forzar detección real) + estimado T1/T2/T3 + gates pendientes. Nunca ejecuta Bash contra el target, nunca dispara subagentes, nunca crea `vulnerabilities.json`.
+- **Regla dura**: un dry-run nunca satisface Gate D — toda transición recon→activo posterior exige re-confirmación independiente, aunque el usuario cite un preview previo en la misma sesión. Nueva fila en la tabla anti-racionalización.
+- Menú interactivo de los 3 wrappers (`.claude`/`.opencode`/`.gemini`): nota de una línea sobre `--dry-run` — el wrapper sigue siendo delgado, no duplica lógica de gates.
+- README: fila de uso de `--dry-run` en la tabla de modos; ítem sacado del roadmap.
+
 ## [1.6.5] — 2026-09-27
 
 ### Fixed

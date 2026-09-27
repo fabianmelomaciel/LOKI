@@ -30,6 +30,8 @@ Entrada: {{args}}
  7. estático  — solo código sin red: auditor-de-seguridad / cyber-neo
  h. ayuda      — qué hace Loki
  x. cancelar   — no hacer nada
+
+ (agregá "--dry-run" a tu respuesta para previsualizar qué comandos correría, sin ejecutar nada)
 ```
 
 ### 3. Al responder → confirmá en ese mismo intercambio
