@@ -2,6 +2,11 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.5] — 2026-09-27
+
+### Fixed
+- `token_estimate` en el frontmatter de `SKILL.md` estaba subestimado (`input: 4200`): una medición cruda de caracteres del archivo (`wc -c` / 4) ya da ~5595 tokens solo para el body. Recalibrado a `input: 5600`. Ítem sacado del roadmap del README, ya no está pendiente.
+
 ## [1.6.4] — 2026-09-27
 
 ### Added

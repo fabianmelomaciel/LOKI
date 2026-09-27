@@ -1,6 +1,6 @@
 ---
 name: loki
-version: 1.6.4
+version: 1.6.5
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
@@ -12,7 +12,7 @@ description: >
 category: agent
 status: stable
 risk_level: critical
-token_estimate: { input: 4200, output: 1600 }
+token_estimate: { input: 5600, output: 1600 }
 allowed-tools:
   - Read
   - Grep
