@@ -2,6 +2,11 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.3] — 2026-09-27
+
+### Added
+- Roadmap: ítem indicador de progreso — hoy una corrida `standard`/`deep` no muestra en qué fase/comando está mientras corre, solo el informe final. Sugerido en el consejo `agente-ideas` de v1.6.1, agregado a pedido del CEO.
+
 ## [1.6.2] — 2026-09-27
 
 ### Added
