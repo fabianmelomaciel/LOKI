@@ -1,0 +1,55 @@
+# Evidencias y corridas — nunca commitear
+reports/*
+!reports/.gitkeep
+!reports/informe-ejemplo.md
+.loki/
+*.sarif
+vulnerabilities.json
+run.json
+scope.txt
+!templates/scope.txt
+
+# Artefactos crudos de hack-audit / evidencia de pentest
+evidencia/
+recon.md
+hipotesis.md
+modelo-de-amenazas.md
+reglas-de-enfrentamiento.md
+*.har
+*.pcap
+
+# Secretos
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+credentials*
+*.token
+.aws/
+.ssh/
+
+# Generados / locales
+.codegraph/
+CODEX.md
+*.log
+*.bak
+*.tmp
+
+# Dependencias
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
