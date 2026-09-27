@@ -3,10 +3,12 @@
 > Copiar esta plantilla a `reports/<fecha>-<target>/informe.md` y rellenar. Estructura fija — no reordenar secciones. Todo hallazgo necesita PoC reproducible o se descarta.
 > **Cierre obligatorio (SKILL.md paso 12):** generar `informe.html` desde `templates/informe.html` (contenido HTML-escapado) y abrirlo en el navegador default del SO — imprimir siempre el link `file:///`.
 > **Priorización (ver `references/dev-vs-prod.md`):** §3 ordena **producción primero** — `alcance: prod/ambos` antes que `dev`, duda → prod.
+> **Target multi-repo (ver `references/multi-repo-guard.md`):** si `scope.txt` declaró más de un `REPOS=` (modo `equipo` intencional), **nunca** un solo `{target}` mezclando hallazgos de repos distintos. Generar un `informe-<repo>.md` completo (cabecera + §1-§7, hash de evidencia propio) por cada repo dentro de `reports/<fecha>-<target-padre>/`, y un `informe.md` raíz que solo resume qué repos se auditaron con link a cada uno.
+> **Para IDEs con IA que van a reparar hallazgos:** este `.md` (y su espejo `.html`) son para lectura humana. El artefacto para reparar en loop es `vulnerabilities.json` — cada hallazgo trae `file`+`line`, `remediation` (criterio) y, cuando el fix es mecánico, `fix_snippet` (código corregido ≤10 líneas listo para aplicar). Iterar ese JSON, no parsear prosa.
 
 ```markdown
 # 🔐 Informe de Auditoría — Loki
-**Target:** {target} │ **Fecha:** {fecha} │ **Modo:** {quick|standard|deep} │ **Tipo:** {codigo|red|equipo}
+**Target:** {target} (single-repo; si multi-repo ver nota arriba — un `{target}` = un repo, siempre) │ **Fecha:** {fecha} │ **Modo:** {quick|standard|deep} │ **Tipo:** {codigo|red|equipo}
 **Scope:** {scope.txt resumido} │ **Gates:** A✓ B✓ C✓ D✓ E✓
 **Estado:** 🟢 Completado / 🟡 Cobertura no completada / 🔴 Detenido por gate
 **Redacción:** Secretos → {n} placeholders │ PII → {n} minimizada (checklist EVIDENCIAS.md)
@@ -39,6 +41,7 @@
 - **PoC (reproducible):** {request/comando/pasos exactos}
 - **Impacto:** {qué puede lograr un atacante}
 - **Remediación:** {fix concreto, no genérico}
+- **Fix rápido:** {fix_snippet si existe en vulnerabilities.json — código corregido ≤10 líneas; omitir esta línea si no aplica}
 - **Evidencia:** {hash SHA-256 + timestamp}
 
 #### Conteo

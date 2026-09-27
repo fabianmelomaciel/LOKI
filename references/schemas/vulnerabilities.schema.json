@@ -21,6 +21,7 @@
           "endpoint": { "type": "string" },
           "finding": { "type": "string" },
           "remediation": { "type": "string" },
+          "fix_snippet": { "type": "string", "maxLength": 800, "description": "Código corregido ≤10 líneas (opcional, cuando el fix es puntual y mecánico). Da un IDE con IA lo que necesita para aplicar el fix directo desde este JSON, sin releer el informe.md/html completo." },
           "poc": { "type": "string", "maxLength": 1000, "description": "Pasos/string ≤10 líneas, reproducible. Sin secretos vivos ni PII." },
           "snippet": { "type": "string", "maxLength": 800, "description": "≤10 líneas. Nunca dumps de archivos completos." },
           "tier": { "enum": ["t0-pasivo", "t0-activo", "t1", "t2", "t3"] },

@@ -2,6 +2,36 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.5.0] — 2026-09-27
+
+Ronda de pulido: salida accionable para IDEs con IA, higiene de README (badge desincronizado, duplicación con CHANGELOG) e investigación de mercado repetida (Xalgorix, Pentest-Swarm-AI/PentestAgent, ecosistema skill-audit). Deliberación `agente-ideas`, pedido explícito del CEO ("mejora el proyecto lo mas que pueda... reduccion de tokens... que los IDE ia puedan repararlo").
+
+### Added
+- **Campo `fix_snippet`** (opcional, ≤10 líneas) en `vulnerabilities.schema.json`: código corregido listo para aplicar cuando el fix es mecánico, sin desplazar a `remediation` (que sigue siendo el criterio en prosa para fixes de rediseño). `SKILL.md` (Fase 4) y `docs/estandares/informe-maestro.md` documentan cuándo completarlo.
+- **`vulnerabilities.json` declarado explícitamente como artefacto canónico para IDEs con IA** — nueva sección README "🤖 Salida lista para que un IDE con IA repare los hallazgos"; `informe.md`/`.html` quedan como lectura humana, el JSON (+ SARIF) como lo que un agente itera para reparar.
+- CI: el badge de versión del README ahora se valida contra `loki.manifest.sh`/`SKILL.md` (antes solo esos dos se comparaban entre sí — el badge quedó en 1.0.0 desde el primer release sin que nada lo detectara).
+
+### Changed
+- README: sección "Mejoras recientes" (duplicaba `CHANGELOG.md` casi textual, crecía sin límite en cada versión) reemplazada por un resumen de 3 líneas + link — reduce el tamaño del archivo que más se carga como contexto.
+- README: tabla "Frente al resto del ecosistema" ampliada con hallazgos de la investigación de esta ronda (Xalgorix, Pentest-Swarm-AI, PentestAgent) y nota sobre el ecosistema de auditoría de skills (`skill-audit`, `UnitOneAI/SecuritySkills`) que valida el enfoque ya aplicado en `references/skill-lint.md`.
+- `AGENTS.md`: el checklist de bump de versión ahora incluye explícitamente el badge del README (antes solo mencionaba `SKILL.md`).
+
+## [1.4.0] — 2026-09-27
+
+Guard multi-repo: evita que Loki mezcle hallazgos de proyectos distintos en un solo informe cuando TARGET es una carpeta padre (ej. `C:\laragon\www`) en vez de la raíz de un repo. Deliberación `agente-ideas` (consejo A/B/C con Stage 2, veto de seguridad, ranking B>C>A) + revisión de auditores SkillGrid (auditor-de-seguridad/cyber-neo/hack-audit — mismo gap, patrón de exclusiones reutilizado de cyber-neo). Decisión del CEO.
+
+### Added
+- **`references/multi-repo-guard.md`**: detección de repos `.git` independientes bajo TARGET antes de tocar cualquier tool T0; STOP con listado de candidatos si hay ≥2; flujo de multi-repo intencional (Gate A/C por repo, patrón validado en hack-audit) y patrón de exclusiones de conteo (`node_modules`/`.git`/`vendor`/`__pycache__`/`dist`/`build`/`.next`/`target`) tomado de `SkillGrid/skills/cyber-neo`.
+- Campos `repo_count` (int) e `is_multi_repo` (bool) en `references/schemas/run.schema.json`, propagados por `scripts/metrics.ps1` a `reports/index.jsonl` — permiten filtrar retroactivamente corridas multi-repo de la tendencia histórica.
+- `docs/normas/ALCANCE.md`: sección "Multi-repo" — `REPOS=` con varias entradas solo en modo `equipo` intencional, Gate A por repo, una carpeta padre nunca es target válido por sí sola.
+
+### Changed
+- `SKILL.md` Fase 1 (paso 5): guard multi-repo corre antes del conteo de archivos; el conteo aplica las exclusiones en el mismo comando (antes contaba el árbol completo sin excludes).
+- `SKILL.md` paso 12 e `docs/estandares/informe-maestro.md`: si multi-repo intencional, un `informe-<repo>.md` por repo (nunca un `{target}` único mezclando repos).
+- `docs/normas/GATES.md` (Gate C): nota de que el gate se satisface por repo, no por carpeta padre.
+- `.claude/commands/loki.md`, `.opencode/commands/loki.md`, `.gemini/commands/loki.toml`: si `git rev-parse --show-toplevel` falla, ya no se asume el cwd como target candidato — se enumeran los repos bajo esa ruta y se exige confirmación explícita.
+- `references/t0-commands.md`: nota de que `<target>` ya pasó el guard (siempre single-repo).
+
 ## [1.3.0] — 2026-09-27
 
 Cierre de informe en navegador + priorización dev/prod de hallazgos. Decisión del CEO (patrón SkillGrid).

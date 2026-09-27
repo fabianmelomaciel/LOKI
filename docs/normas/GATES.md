@@ -16,6 +16,7 @@
 - Lista explícita de hosts, IPs, puertos, rutas y exclusiones. **Deny-by-default**: fuera de la lista → no se toca.
 - Plantilla y denylist de producción: `ALCANCE.md`.
 - Toda superficie nueva descubierta pasa por este mismo gate antes de tocarse.
+- **Multi-repo:** si el TARGET contiene varios repos independientes, Gate C se satisface **por cada repo** (cada uno con su propia línea en `REPOS=`), nunca con una sola entrada que cubra la carpeta padre — ver guard en `references/multi-repo-guard.md` de la skill.
 
 ## Gate D — Confirmación por fase
 Re-confirmación explícita del usuario antes de cada transición:

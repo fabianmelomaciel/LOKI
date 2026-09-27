@@ -6,7 +6,7 @@ Entrada: $ARGUMENTS
 ## CASO A — "Entrada:" vacía → INTERACTIVO (no asumas nada, esperá al usuario)
 
 ### 1. Detección de contexto (solo lectura local, $0, ningún request activo)
-- Directorio actual y ¿hay repo git? → `git rev-parse --show-toplevel` + `git remote get-url origin` (silenciá errores si no hay repo).
+- Directorio actual y ¿hay repo git? → `git rev-parse --show-toplevel` + `git remote get-url origin` (silenciá errores si no hay repo). **Si falla** (no es repo git): NO asumas el directorio actual como target candidato — buscá carpetas `.git` de primer/segundo nivel bajo el cwd (excluyendo `node_modules`); si hay ≥2 repos independientes, el candidato del banner es "ninguno (N repos detectados)" y el paso 3 exige elegir uno o confirmar multi-repo intencional — nunca se autocompleta con la carpeta padre entera (`references/multi-repo-guard.md`).
 - Stack → manifiesto en la raíz detectada (`package.json`, `composer.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, `pom.xml`, `Cargo.toml`, `*.csproj`): solo nombre/versión/deps top-level, vía Glob/Read.
 - Clasificá lo detectado: **URL** (http/https) · **ruta existente** en disco · **IP/red** · **"esta máquina"** · **nada**.
 

@@ -11,7 +11,7 @@
 - Tras cada edición de `install.ps1`/`install.sh`: ejecutar la verificación de sintaxis y reinstalar (`-Check` debe dar SYNC).
 - **Versión y lista de archivos viven en `loki.manifest.sh`** (fuente única) — install.ps1 e install.sh lo leen, no hardcodean nada. Editar solo ahí, nunca en los instaladores directamente.
 - Mantener en sync: listas de tools T0 en instaladores ↔ `references/t0-commands.md` (esto sí sigue siendo manual, no está en el manifest).
-- Actualizar `version` en frontmatter de `SKILL.md` (debe coincidir con `LOKI_VERSION` de `loki.manifest.sh` — el CI lo valida) + entrada en `CHANGELOG.md`.
+- Actualizar `version` en frontmatter de `SKILL.md` **y** el badge de versión en `README.md` (ambos deben coincidir con `LOKI_VERSION` de `loki.manifest.sh` — el CI lo valida) + entrada en `CHANGELOG.md`.
 - Todo `.ps1` con no-ASCII debe guardarse con **BOM UTF-8** (PS 5.1 lee sin BOM como ANSI).
 - Nunca commitear: `reports/` (salvo `informe-ejemplo.md` y `.gitkeep`), `.loki/`, `scope.txt`, secretos, evidencias crudas.
 - CODEX.md es local-only (gitignored); el instalador NO lo copia.

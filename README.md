@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.0.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.5.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -57,9 +57,22 @@ No estamos solos en esto, y no pretendemos serlo. Estas son las referencias que 
 | [**Shannon**](https://github.com/KeygraphHQ/shannon) | Gate de autorización, 5 fases estilo OWASP | Requiere Docker; no corre nativo dentro del IDE |
 | **CAI** (Cybersecurity AI) | Framework de agentes para CTF/red-team | Enfocado en investigación, no en informes de compliance |
 | **PentestGPT** | Guía de pentest conversacional sobre un LLM | Sin ejecución real de herramientas, sin PoC obligatoria |
+| [**Xalgorix**](https://github.com/xalgorix/xalgorix) | Metodología de 22 fases, telemetría en vivo, CVSS por hallazgo | Self-hosted con infraestructura propia (no un `SKILL.md` que corra dentro del IDE); sin cascada de costo T0→T3 |
+| [**Pentest-Swarm-AI**](https://github.com/Armur-Ai/Pentest-Swarm-AI) / [**PentestAgent**](https://github.com/GH05TCREW/pentestagent) | Swarm de agentes especializados (recon/explotación/informe) | Sin gates de autorización no negociables ni mapeo normativo (ISO 27001, leyes de datos) de fábrica |
 | **Loki** | Todo lo anterior combinado en un `SKILL.md` portable | — |
 
+*Investigación de mercado repetida en cada ronda de mejora (última: 2026-09-27) — ver deliberación en `CODEX.md`. El ecosistema de auditoría de *skills* mismas (`skill-audit`, [`UnitOneAI/SecuritySkills`](https://github.com/UnitOneAI/SecuritySkills)) valida el mismo enfoque que Loki ya aplica sobre las skills que delega — ver `references/skill-lint.md`.*
+
 **Lo que nadie más trae de fábrica:** mapeo obligatorio a **ISO/IEC 27001:2022 Annex A** por cada hallazgo (no como anexo opcional, sino como campo requerido en el schema — ver [`references/iso27001-mapping.md`](references/iso27001-mapping.md)), además de CWE Top 25, OWASP Top 10/ASVS/WSTG/LLM Top 10, MITRE ATT&CK/ATLAS, NIST SP 800-115/CSF 2.0 y PTES en el mismo informe. Salida en **SARIF 2.1.0** para integrarlo directo a tu pipeline de CI/CD.
+
+## 🤖 Salida lista para que un IDE con IA repare los hallazgos
+
+El informe en `.md`/`.html` es para vos. El artefacto para que un agente itere y corrija es **`vulnerabilities.json`** (`references/schemas/vulnerabilities.schema.json`): cada hallazgo trae `file`+`line` exactos, `remediation` (criterio) y, cuando el fix es mecánico, `fix_snippet` — código corregido ≤10 líneas listo para aplicar sin releer el informe completo. Salida también en **SARIF 2.1.0** para integrarlo a herramientas de auto-remediación que ya hablan ese formato.
+
+```
+Pedile a tu IDE: "leé reports/<fecha>-<target>/vulnerabilities.json y aplicá
+los fixes de severidad critical/high" — tiene todo lo que necesita ahí.
+```
 
 ## 🧩 Funciona en tu AI IDE, ya
 
@@ -179,17 +192,9 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 
-## Mejoras recientes (v1.1.0 → v1.3.0): normas, leyes y cumplimiento mundial
+## Historial de versiones
 
-- **Cierre en navegador (v1.3.0)**: el informe final se genera también como `informe.html` (`templates/informe.html`, contenido escapado Gate E) y se abre solo en el **navegador default del SO** (Windows/Linux/macOS, patrón SkillGrid) — siempre con el link `file:///` de respaldo.
-- **Priorización dev/prod (v1.3.0)**: cada hallazgo se clasifica con `alcance: prod/dev/ambos` analizando `.gitignore`, `devDependencies` y pipeline de deploy (`references/dev-vs-prod.md`) — **lo que afecta producción va primero** en el informe.
-
-- **`/loki` interactivo**: sin argumentos detecta tu contexto (¿repo git y su origin?, ¿stack?, ¿URL/ruta/IP?) y ofrece menú de opciones — pentest completo (postura ofensiva tipo hack-audit/Strix/Shannon), `scan`, `quick`, `standard`, `deep`, `hack-audit`, estático, ayuda y cancelar. Con argumento arranca directo. Disponible en **opencode, Claude Code y Gemini CLI** (`.gemini/commands/*.toml`), instalado/desinstalado/verificado por ambos instaladores.
-- **Informe listo para reparar**: cada hallazgo exige `remediation` concreto + PoC reproducible (schema obligatorio).
-- **Cumplimiento normativo en cada informe (§7)**: ISO/IEC 27001:2022 Annex A obligatorio por hallazgo + **leyes de datos personales de todo el mundo** — Uruguay **Ley 18.331**, GDPR (UE), LGPD (Brasil), CCPA (California), PIPEDA, APPI, PDPA, POPIA y homólogas, con artículos, plazos de notificación (GDPR 72 h) y remediación vinculada → [`references/leyes-datos-personales.md`](references/leyes-datos-personales.md) (referencia, no asesoría legal — ver [`docs/normas/LEGALES.md`](docs/normas/LEGALES.md)).
-- **Benchmark medible**: `scripts/score.ps1` (precision/recall/F1 contra ground truth), `digest-sarif.ps1` (dumps grandes → snippets), `delta.ps1` (hallazgos new/fixed entre corridas).
-- **Skill-lint preflight** (15 patrones BLOQUEO/WARN) + job CI dogfooding; instaladores **fail-closed**: sin `sha256sum`/`shasum` → abortan, y `-Check` compara SHA-256 de todos los archivos + detecta fuentes/destinos alterados.
-- **Slash-commands**: `/loki` (interactivo) y `/loki-scan` (T0 gratis $0) como wrappers delgados de la skill — los 5 gates siguen siendo inmutables.
+Cada versión, qué cambió y por qué está en [`CHANGELOG.md`](CHANGELOG.md) (formato Keep a Changelog). Highlights recientes: guard multi-repo para no mezclar proyectos distintos en un informe (v1.4.0), salida `fix_snippet` para que un IDE con IA repare hallazgos directo desde `vulnerabilities.json` (v1.5.0), cierre automático en navegador + priorización dev/prod (v1.3.0), `/loki` interactivo multi-engine + cumplimiento normativo mundial (v1.2.0).
 
 ## Contribuir
 

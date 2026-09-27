@@ -9,6 +9,8 @@
     "mode": { "enum": ["scan", "quick", "standard", "deep"] },
     "target_type": { "enum": ["codigo", "red", "equipo", "completo"] },
     "targets": { "type": "array", "items": { "type": "string" } },
+    "repo_count": { "type": "integer", "minimum": 0, "description": "Repos independientes auditados en esta corrida (1 en el caso normal single-repo) — ver references/multi-repo-guard.md" },
+    "is_multi_repo": { "type": "boolean", "description": "true si el usuario confirmó multi-repo intencional (modo equipo) tras el guard de Fase 1" },
     "started_at": { "type": "string", "format": "date-time" },
     "finished_at": { "type": "string", "format": "date-time" },
     "wall_clock_s": { "type": "number" },

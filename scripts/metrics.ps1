@@ -37,6 +37,10 @@ $fPer1k = if ($tok -gt 0) { [math]::Round($total / ($tok / 1000), 3) } else { 0 
 $fp = @($findings | Where-Object { $_.status -eq "rejected_fp" }).Count
 $fpRate = if (($total + $fp) -gt 0) { [math]::Round(100 * $fp / ($total + $fp), 1) } else { 0 }
 
+# Multi-repo (references/multi-repo-guard.md) — default single-repo si run.json es de antes de este campo
+$repoCount = if ($run.PSObject.Properties.Name -contains "repo_count") { [int]$run.repo_count } else { 1 }
+$isMultiRepo = if ($run.PSObject.Properties.Name -contains "is_multi_repo") { [bool]$run.is_multi_repo } else { $false }
+
 # conteos por severidad
 $sev = @{}
 foreach ($s in @("critical", "high", "medium", "low", "info")) {
@@ -58,6 +62,7 @@ Write-Output ("findings/1K tokens : " + $fPer1k)
 Write-Output ("% T0 gratis        : " + $pctT0 + "% (objetivo >=70%) " + $(if ($pctT0 -ge 70) { "OK" } else { "BAJO" }))
 Write-Output ("FP descartados     : " + $fp + " (" + $fpRate + "%)")
 Write-Output ("evidence hashes    : " + @($run.evidence_hashes).Count)
+Write-Output ("repo_count         : " + $repoCount + " (multi-repo: " + $isMultiRepo + ")")
 Write-Output ""
 
 # Append a reports/index.jsonl para tendencia
@@ -71,6 +76,8 @@ $line = (@{
     pct_t0        = $pctT0
     critical      = $sev["critical"]
     high          = $sev["high"]
+    repo_count    = $repoCount
+    is_multi_repo = $isMultiRepo
 } | ConvertTo-Json -Compress)
 Add-Content -Path $idx -Value $line
 Write-Output ("index.jsonl  <--  " + $line)
