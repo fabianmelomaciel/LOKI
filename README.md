@@ -10,7 +10,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-6b46c1)](#-funciona-en-tu-ai-ide-ya)
 [![OpenCode](https://img.shields.io/badge/OpenCode-compatible-2ea44f)](#-funciona-en-tu-ai-ide-ya)
 [![ISO 27001](https://img.shields.io/badge/ISO%2027001-mapeo%20nativo-005571)](references/iso27001-mapping.md)
-[![PRs welcome](https://img.shields.io/badge/PRs-bienvenidas-orange)](AGENTS.md)
+[![PRs welcome](https://img.shields.io/badge/PRs-bienvenidas-orange)](CONTRIBUTING.md)
 
 *Creado y mantenido por **Lic. Fabián Melo**.*
 
@@ -131,6 +131,7 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 ```
 ├── SKILL.md                # skill maestra (gates + routing + tiers)
 ├── AGENTS.md                # reglas inmutables para contributors
+├── CONTRIBUTING.md           # guía de PR para contributors externos
 ├── docs/normas/              # ético, gates, alcance, evidencias, legal
 ├── docs/estandares/           # checklist normativo + plantilla de informe
 ├── references/                # execution-tiers, t0-commands, dispatch, cache, schemas/
@@ -176,7 +177,7 @@ Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienv
 
 ## Contribuir
 
-Los 5 gates, la regla "no exploit no report" y los límites de rate son **inmutables** (ver `AGENTS.md`) — todo lo demás, PRs bienvenidas.
+Guía paso a paso para PRs: [`CONTRIBUTING.md`](CONTRIBUTING.md). Los 5 gates, la regla "no exploit no report" y los límites de rate son **inmutables** (ver `AGENTS.md`) — todo lo demás, PRs bienvenidas.
 
 ## Licencia
 
