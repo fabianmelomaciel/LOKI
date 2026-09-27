@@ -109,6 +109,7 @@ El instalador detecta qué herramientas T0 tenés disponibles e imprime la **mat
 
 | Modo | Duración | Techo | Qué hace |
 |------|----------|-------|----------|
+| `scan` | ≤1 min | **$0** (sin LLM) | Solo T0-pasivo, salida cruda sin dedup — para CI/pre-commit |
 | `quick` (default) | ≤5 min | $0.10 | T0-pasivo + triage + síntesis |
 | `standard` | ~30 min | $2 | + T0-activo + subagentes en paralelo |
 | `deep` | horas | $10 hard cap | + Strix / explotación real |

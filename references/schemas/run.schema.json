@@ -6,7 +6,7 @@
   "properties": {
     "version": { "type": "string", "const": "1.0.0" },
     "status": { "enum": ["completed", "stopped_budget", "stopped_turns", "stopped_error", "coverage_partial", "blocked_gate"] },
-    "mode": { "enum": ["quick", "standard", "deep"] },
+    "mode": { "enum": ["scan", "quick", "standard", "deep"] },
     "target_type": { "enum": ["codigo", "red", "equipo", "completo"] },
     "targets": { "type": "array", "items": { "type": "string" } },
     "started_at": { "type": "string", "format": "date-time" },
@@ -62,9 +62,11 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["engine", "ref", "sha256"],
         "properties": {
           "engine": { "enum": ["strix"] },
           "ref": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "SHA-256 del paquete descargado, verificado contra el hash publicado antes de ejecutar — ver SKILL.md T3" },
           "cost_usd": { "type": "number" }
         }
       }

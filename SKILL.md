@@ -109,17 +109,17 @@ Mostrá este aviso antes de cada corrida:
 Extraer de la entrada del usuario:
 1. **TARGET** — ruta de repo, URL, IP/red o "esta máquina".
 2. **MODO** — `codigo` | `red` | `equipo` | `completo` (default: detectar).
-3. **MODO DE EJECUCIÓN** — `quick` (default) | `standard` | `deep`.
+3. **MODO DE EJECUCIÓN** — `scan` | `quick` (default) | `standard` | `deep`.
 4. **SCOPE** — inclusiones/exclusiones (o pedir `scope.txt`; copiar `templates/scope.txt` como base).
 
 ```
 🔐 Loki
 ├─ Target: {TARGET}
 ├─ Tipo:   {MODO}
-├─ Tier:   {quick|standard|deep}
+├─ Tier:   {scan|quick|standard|deep}
 └─ Scope:  {scope.txt o "a confirmar en Gate C"}
 
-Estimado: quick ≤5 min (~$0.10) │ standard ~30 min (~$2) │ deep horas (cap $10)
+Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~30 min (~$2) │ deep horas (cap $10)
 ```
 
 ---
@@ -141,6 +141,7 @@ Estimado: quick ≤5 min (~$0.10) │ standard ~30 min (~$2) │ deep horas (cap
 **Presupuesto (obligatorio):** crear `.loki/budget.json` al inicio `{mode, cap_usd, spent_usd: 0, max_turns: 20}`; incrementar `spent_usd` tras cada fase. Si `spent_usd > cap_usd*0.8` → solo T0+informe. Techos: quick $0.10 / standard $2 / deep $10.
 
 **Modos:**
+- `scan`: **solo T0-pasivo**, $0 y sin LLM (ni triage T1 ni síntesis T2). Salida = hallazgos crudos de los scanners tal cual (SARIF/JSON en `.loki/t0/`), **sin deduplicar y sin verificar falsos positivos**. Pensado para CI/pre-commit o para el operador que solo quiere "correlo y mostrame lo que salió" gratis. ≤1 min. Declarar en el informe: "modo scan — sin dedup, revisar manualmente".
 - `quick` (default): T0-pasivo + triage T1 + síntesis T2 de top findings. T0-activo solo con C+D. ≤5 min.
 - `standard`: + subagentes por categoría en paralelo (≤5) + T2 dirigido (auth/crypto). ~30 min.
 - `deep`: habilita T3 (Strix/explotación activa). Requiere Gates C+D y confirmación de presupuesto (cap $10 duro).
@@ -167,7 +168,10 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 **Obligatorio en todo prompt de subagente:** re-inyectar los 5 gates + Gate E **verbatim**, adjuntar `scope.txt`, y el output schema de `references/schemas/vulnerabilities.schema.json` (patrón auditor-de-seguridad: constraints verbatim). Ver `references/dispatch.md` para prompts-cervecía (T1-triage, T2-verify).
 
 **T3 opcional (solo `deep`):**
-- Strix: instalar con **pin fijo** — `npx skills add usestrix/strix@b0866244 --skill strix-pentest` (revisar diff del paquete antes de la primera ejecución; registrar el ref en `run.json`) y luego `strix -n -t <target> --scan-mode deep --max-budget 10`. Importar sus hallazgos → dedup clave CWE+file+line → sumar su `cost_usd` al total.
+- Strix: instalar con **pin fijo** — `npx skills add usestrix/strix@b0866244 --skill strix-pentest`.
+  - **Verificación de integridad (obligatoria antes de ejecutar):** calcular `sha256sum` del paquete descargado y compararlo contra el hash registrado en `references/strix-pin.sha256`. Si coincide → continuar. Si **no** coincide o el archivo no existe todavía → **STOP**, no ejecutar Strix, avisar al usuario ("hash no verificado — puede ser una versión modificada/comprometida del pin") y pedir confirmación explícita antes de: (a) tratarlo como primera vetación legítima y grabar el hash nuevo en `references/strix-pin.sha256` (requiere aprobación humana, no automática), o (b) abortar T3.
+  - Registrar `sha256` (y `ref`) en `run.json.externals[]` — es campo obligatorio del schema.
+  - Ejecutar: `strix -n -t <target> --scan-mode deep --max-budget 10`. Importar sus hallazgos → dedup clave CWE+file+line → sumar su `cost_usd` al total.
 - Shannon: NO integrado (requiere Docker); heredar únicamente su gate de autorización (ya cubierto por Gate A).
 
 ---
@@ -180,6 +184,7 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 4. **Budget** → crear `.loki/budget.json` con cap del modo.
 5. **Fase 1 — Recon (síncrona):** detectar stack, contar archivos (<1k full / 1k–10k targeted / >10k critical-path), copiar `templates/scope.txt` → `scope.txt` y completarlo (**Gate C listo**). Guard **target ≠ host propio**.
 6. **Fase 2 — T0-pasivo:** cache primero (`references/cache.md` — `.loki/tools-cache.json` para detección, `.loki/scan-cache.json` para secretos/IaC si el hash del árbol no cambió; Trivy/npm audit/Safety nunca se cachean), luego lanzar en paralelo los escaneos de lectura restantes (`references/t0-commands.md`; `which` primero si no hay cache válido; ausentes → listar en informe). **Append** a `.loki/audit-log.jsonl`: `{ts, phase:"t0-pasivo", gates:"A,B,E", commands:[...]}`. Declarar `cache.tools_cache_hit`/`cache.scan_cache_hit` en `run.json`.
+   **(si `scan`) STOP acá:** informe directo con los SARIF/JSON crudos de Fase 2, sin Fases 3/4/5 — declarar explícitamente "sin dedup, revisar manualmente". No crea `vulnerabilities.json` normalizado.
 7. **Gate D (transición a activo)** → si el modo lo requiere y C está completo, re-confirmar con el usuario. **T0-activo:** nuclei/nmap/ffuf/nikto/curl con rate ≤5 req/s. Append audit-log con `gates:"A,B,C,D,E"`.
 8. **Fase 3 — T1 triage:** subagentes baratos (prompt de `references/dispatch.md`, gates verbatim) deduplican → `vulnerabilities.json` según `references/schemas/vulnerabilities.schema.json`. Append audit-log.
 9. **Fase 4 — T2 verificación:** todo `critical`/`high` pasa por razonamiento profundo (prompt T2-verify). Hallazgos de `hack-audit` (sin `cwe`/`iso27001` nativo) se completan acá contra `references/iso27001-mapping.md` antes de escribir `vulnerabilities.json`. Actualizar budget `spent_usd`.

@@ -1,0 +1,8 @@
+# Hash de integridad del pin de Strix (usestrix/strix@b0866244)
+# Formato: <sha256>  <descripción>
+#
+# TODO: completar tras la primera instalación vetada del pin actual
+# (npx skills add usestrix/strix@b0866244 --skill strix-pentest) —
+# ver procedimiento en SKILL.md, sección "T3 opcional".
+# Sin esta línea, SKILL.md exige STOP + confirmación humana antes de
+# tratar cualquier hash como legítimo.

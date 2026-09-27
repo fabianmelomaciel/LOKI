@@ -27,16 +27,19 @@ Sonnet/Pro: lógica de negocio, authz/IDOR, crypto, síntesis del informe.
 - Merge/dedup central en el orquestador.
 
 ## T3 — EXTERNO (solo `deep`, opt-in, pin obligatorio)
-- **Strix:** `npx skills add usestrix/strix@b0866244 --skill strix-pentest` (revisar diff del paquete; registrar `ref` en `run.json.externals[]`) → `strix -n -t <target> --scan-mode deep --max-budget 10`.
+- **Strix:** `npx skills add usestrix/strix@b0866244 --skill strix-pentest` → verificar `sha256sum` contra `references/strix-pin.sha256` **antes** de ejecutar (mismatch o archivo vacío → STOP + confirmación humana, ver SKILL.md T3) → registrar `ref`+`sha256` en `run.json.externals[]` → `strix -n -t <target> --scan-mode deep --max-budget 10`.
 - Importar hallazgos Strix → dedup CWE+file+line → sumar `cost_usd` al total.
 - **Shannon:** NO integrado (Docker); solo hereda Gate A.
 
 ## Modos, techos y budget
 | Modo | Duración | Alcance | Techo (`budget.json.cap_usd`) |
 |------|----------|---------|-------------------------------|
+| `scan` | ≤1 min | **Solo T0-pasivo**, salida cruda sin dedup ni LLM | **$0** (sin LLM) |
 | `quick` (default) | ≤5 min | T0-pasivo + T1 + T2 top findings | $0.10 |
 | `standard` | ~30 min | + T0-activo (gate) + subagentes ≤5 + T2 dirigido | $2 |
 | `deep` | horas | + T3/explotación (gates C+D) | **$10 hard cap** |
+
+`scan` es el único modo sin T1/T2: no hay dedup ni supresión de falsos positivos, los hallazgos de cada scanner se reportan tal cual salen. Útil para CI/pre-commit gratis; no reemplaza `quick` para un informe curado.
 
 - `.loki/budget.json`: `{mode, cap_usd, spent_usd: 0, max_turns: 20}` — incrementar `spent_usd` tras cada fase; si `spent_usd > cap*0.8` → solo T0+informe.
 - Defaults: `max_turns: 20`; timeout global 15 min (quick) / 60 min (standard).
