@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loki run.json",
+  "type": "object",
+  "required": ["version", "status", "mode", "targets", "started_at", "llm_usage"],
+  "properties": {
+    "version": { "type": "string", "const": "1.1.0" },
+    "status": { "enum": ["completed", "stopped_budget", "stopped_turns", "stopped_error", "coverage_partial", "blocked_gate"] },
+    "mode": { "enum": ["quick", "standard", "deep"] },
+    "target_type": { "enum": ["codigo", "red", "equipo", "completo"] },
+    "targets": { "type": "array", "items": { "type": "string" } },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "wall_clock_s": { "type": "number" },
+    "phase_seconds": { "type": "object", "additionalProperties": { "type": "number" } },
+    "findings_by_phase": { "type": "object", "additionalProperties": { "type": "integer" } },
+    "gates": {
+      "type": "object",
+      "properties": {
+        "A": { "type": "boolean" }, "B": { "type": "boolean" },
+        "C": { "type": "boolean" }, "D": { "type": "boolean" }, "E": { "type": "boolean" }
+      },
+      "required": ["A", "B", "C", "D", "E"]
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "cap_usd": { "type": "number" },
+        "spent_usd": { "type": "number" }
+      }
+    },
+    "llm_usage": {
+      "type": "object",
+      "required": ["input_tokens", "output_tokens", "cost_usd"],
+      "properties": {
+        "input_tokens": { "type": "integer" },
+        "output_tokens": { "type": "integer" },
+        "cost_usd": { "type": "number" },
+        "by_model": { "type": "object", "additionalProperties": { "type": "number" } }
+      }
+    },
+    "t0_tools": {
+      "type": "object",
+      "properties": {
+        "available": { "type": "array", "items": { "type": "string" } },
+        "missing": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "ts"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "ts": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "externals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "engine": { "enum": ["strix"] },
+          "ref": { "type": "string" },
+          "cost_usd": { "type": "number" }
+        }
+      }
+    },
+    "coverage_note": { "type": "string" }
+  }
+}

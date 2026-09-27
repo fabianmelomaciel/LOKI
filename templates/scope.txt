@@ -1,0 +1,19 @@
+# Loki — scope.txt (deny-by-default) — plantilla para Gate C
+# Copiar a la carpeta de la corrida y completar ANTES de cualquier fase activa.
+
+# INCLUSIONES (lo único que se puede tocar)
+TARGET_URL=
+HOSTS=
+PORTS=
+PATHS=
+REPOS=
+
+# EXCLUSIONES (prioridad sobre inclusiones)
+EXCLUDE_PATHS=/logout,/admin/delete
+EXCLUDE_HOSTS=
+
+# METADATOS
+ENVIRONMENT=staging          # staging|sandbox|local — NUNCA production
+AUTHORIZATION=               # Gate A: owner|escrita
+DATE=
+OPERATOR=

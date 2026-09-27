@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loki vulnerabilities.json",
+  "type": "object",
+  "required": ["version", "findings"],
+  "properties": {
+    "version": { "type": "string", "const": "1.1.0" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "cwe", "file", "finding", "remediation", "poc"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^EH-[0-9]{3,}$" },
+          "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+          "cwe": { "type": "string", "pattern": "^CWE-[0-9]+$" },
+          "owasp": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "endpoint": { "type": "string" },
+          "finding": { "type": "string" },
+          "remediation": { "type": "string" },
+          "poc": { "type": "string", "maxLength": 1000, "description": "Pasos/string ≤10 líneas, reproducible. Sin secretos vivos ni PII." },
+          "snippet": { "type": "string", "maxLength": 800, "description": "≤10 líneas. Nunca dumps de archivos completos." },
+          "tier": { "enum": ["t0-pasivo", "t0-activo", "t1", "t2", "t3"] },
+          "evidence_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "status": { "enum": ["new", "confirmed", "rejected_fp", "fixed"] }
+        }
+      }
+    }
+  }
+}
