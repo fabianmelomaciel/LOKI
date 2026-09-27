@@ -134,6 +134,8 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 ├── CONTRIBUTING.md           # guía de PR para contributors externos
 ├── docs/normas/              # ético, gates, alcance, evidencias, legal
 ├── docs/estandares/           # checklist normativo + plantilla de informe
+├── docs/BENCHMARK.md           # metodología de benchmark reproducible
+├── docs/DEMO.md                 # cómo grabar la demo visual (asciinema/GIF)
 ├── references/                # execution-tiers, t0-commands, dispatch, cache, schemas/
 ├── templates/scope.txt         # plantilla de Gate C
 ├── scripts/metrics.ps1          # findings/USD, %T0, tendencia
@@ -172,6 +174,8 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 - [ ] Agentes especializados de *host-hardening* por SO: revisión de registro/servicios en Windows, `systemd`/permisos en Linux, `launchd`/entitlements en macOS.
 - [ ] Reglas dedicadas de auditoría de red interna contra un servidor propio (más allá de nmap/nuclei genéricos ya soportados en T0-activo).
 - [ ] Integración opcional de Shannon sin requerir Docker.
+- [ ] Benchmark publicado (metodología ya definida en [`docs/BENCHMARK.md`](docs/BENCHMARK.md), falta la corrida real contra Juice Shop/DVWA).
+- [ ] Demo visual embebida (instrucciones listas en [`docs/DEMO.md`](docs/DEMO.md), falta grabarla).
 
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 
