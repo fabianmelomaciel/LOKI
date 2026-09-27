@@ -2,6 +2,10 @@
 
 Una línea por herramienta. Detectar con `which <tool>` antes de lanzar; ausentes → declarar en el informe. Los pasivos corren con Gates A+B+E; los activos **solo** con C+D y rate ≤5 req/s.
 
+## Paso 0 — Cache (ver `references/cache.md`)
+
+Antes de detectar: si `.loki/tools-cache.json` existe, no venció (TTL 24h) y `host_fingerprint` coincide → reusar la matriz sin re-correr `which`/`Get-Command` por herramienta. Antes de escanear secretos/IaC (Gitleaks/TruffleHog/Checkov/Bandit): si `.loki/scan-cache.json` tiene el hash SHA-256 del árbol actual sin vencer → reusar los SARIF cacheados y saltar esas herramientas. **Trivy, npm audit, Safety y nuclei nunca se cachean** (dependen de CVE feeds externos) — siempre re-corren. Declarar `cache_hit` en `run.json` cuando se reusa.
+
 ## T0-pasivo (lectura — siempre permitido)
 
 ```bash

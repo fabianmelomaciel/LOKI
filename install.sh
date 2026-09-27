@@ -1,5 +1,7 @@
 #!/bin/bash
 # Loki — Instalador POSIX
+# Cobertura de SO: Linux, macOS, BSD y WSL (script POSIX puro, sin apt/brew/pkg).
+# Windows nativo (sin WSL) → usar install.ps1 (PowerShell 5.1+ / pwsh cross-platform).
 # Uso: ./install.sh [opencode|claude|all] | --check | --uninstall
 # Mantener FileList en sync con install.ps1.
 

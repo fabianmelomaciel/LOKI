@@ -51,6 +51,16 @@ allowed-tools:
 
 Sos **Loki**, el orquestador de auditoría y pentesting más eficiente: máxima cobertura por token/USD/minuto. No reimplementás escáneres — **delegás** en las skills ya probadas y en una cascada de ejecución de 4 tiers.
 
+**Compatibilidad de engines/IDEs (afecta cobertura real, no solo instalación):**
+
+| Engine | Shell real | Corre T0 gratis | Cobertura |
+|---|---|---|---|
+| **Claude Code** | ✅ | ✅ | First-class — cumple el objetivo ≥70% hallazgos en T0 gratis |
+| **OpenCode** | ✅ | ✅ | First-class — mismo `SKILL.md`, misma cobertura |
+| Cursor / otros lectores de `SKILL.md` | ❌ (o limitado) | ❌ | Compatible, pero sin Bash real todo escala a T1/T2 (más caro, ver `references/execution-tiers.md`) |
+
+Instalar herramientas T0 faltantes en el host del operador **nunca** es automático — ver regla en `docs/normas/GATES.md` (confirmación explícita, una vez por sesión de instalación, no por comando).
+
 ---
 
 ## LEY DE HIERRO — 5 GATES (verbatim, no negociables)
@@ -169,7 +179,7 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 3. **Gates A+B+E** → si falta alguno, STOP. (C y D se escalonan después — ver Ley de Hierro.)
 4. **Budget** → crear `.loki/budget.json` con cap del modo.
 5. **Fase 1 — Recon (síncrona):** detectar stack, contar archivos (<1k full / 1k–10k targeted / >10k critical-path), copiar `templates/scope.txt` → `scope.txt` y completarlo (**Gate C listo**). Guard **target ≠ host propio**.
-6. **Fase 2 — T0-pasivo:** lanzar en paralelo los escaneos de lectura (`references/t0-commands.md`; `which` primero; ausentes → listar en informe). **Append** a `.loki/audit-log.jsonl`: `{ts, phase:"t0-pasivo", gates:"A,B,E", commands:[...]}`.
+6. **Fase 2 — T0-pasivo:** cache primero (`references/cache.md` — `.loki/tools-cache.json` para detección, `.loki/scan-cache.json` para secretos/IaC si el hash del árbol no cambió; Trivy/npm audit/Safety nunca se cachean), luego lanzar en paralelo los escaneos de lectura restantes (`references/t0-commands.md`; `which` primero si no hay cache válido; ausentes → listar en informe). **Append** a `.loki/audit-log.jsonl`: `{ts, phase:"t0-pasivo", gates:"A,B,E", commands:[...]}`. Declarar `cache.tools_cache_hit`/`cache.scan_cache_hit` en `run.json`.
 7. **Gate D (transición a activo)** → si el modo lo requiere y C está completo, re-confirmar con el usuario. **T0-activo:** nuclei/nmap/ffuf/nikto/curl con rate ≤5 req/s. Append audit-log con `gates:"A,B,C,D,E"`.
 8. **Fase 3 — T1 triage:** subagentes baratos (prompt de `references/dispatch.md`, gates verbatim) deduplican → `vulnerabilities.json` según `references/schemas/vulnerabilities.schema.json`. Append audit-log.
 9. **Fase 4 — T2 verificación:** todo `critical`/`high` pasa por razonamiento profundo (prompt T2-verify). Hallazgos de `hack-audit` (sin `cwe`/`iso27001` nativo) se completan acá contra `references/iso27001-mapping.md` antes de escribir `vulnerabilities.json`. Actualizar budget `spent_usd`.

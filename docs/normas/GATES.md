@@ -38,3 +38,4 @@ Re-confirmación explícita del usuario antes de cada transición:
 - Secretos hallados → solo placeholder + recomendar rotación (`EVIDENCIAS.md`).
 - Throttle concreto: **≤5 req/s, ≤2 conexiones concurrentes, ≥200 ms entre requests**; backoff exponencial 1s→30s (máx 3) ante 429/5xx. Nuclei/ffuf llevan `-rate 5`.
 - No instalar dependencias en el target; scanners corren desde fuera.
+- **No auto-instalar herramientas en el host del operador** sin confirmación explícita separada de los 5 gates de target (una vez por sesión de instalación de tools, no por comando individual) — que el engine tenga acceso a shell real no es autorización implícita para instalar software nuevo.

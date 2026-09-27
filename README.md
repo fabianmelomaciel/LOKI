@@ -44,6 +44,7 @@ Esto no es letra chica al final del README. Es la razón por la que existe: cual
 | Informe con métricas de costo | ❌ | ❌ | ✅ findings/USD, %T0, tendencia |
 | Funciona igual en Claude Code / OpenCode / Cursor | ❌ | ❌ | ✅ un solo `SKILL.md` |
 | Rate-limit y guard anti auto-daño incorporados | ❌ | Manual | ✅ ≤5 req/s, host-check |
+| Memoria entre corridas (no re-escanea sin cambios) | ❌ | ❌ | ✅ cache por hash de contenido, TTL 24h — ver [`references/cache.md`](references/cache.md) |
 
 ## Frente al resto del ecosistema
 
@@ -69,7 +70,13 @@ Auditá http://staging.ejemplo.local con Loki (modo standard)
 Loki red 192.168.1.0/24 scope=local
 ```
 
-Probado en **Claude Code** y **OpenCode**. Compatible con **Cursor** y cualquier engine que lea `SKILL.md`.
+| Engine | Shell real | Corre T0 gratis | Cobertura |
+|---|---|---|---|
+| **Claude Code** | ✅ | ✅ | First-class |
+| **OpenCode** | ✅ | ✅ | First-class |
+| Cursor / otros lectores de `SKILL.md` | ❌ (o limitado) | ❌ | Compatible, cobertura reducida (todo escala a T1/T2) |
+
+Instaladores multiplataforma: `install.sh` (Linux/macOS/BSD/WSL — POSIX puro) e `install.ps1` (Windows, PowerShell 5.1+/pwsh). Ninguno instala herramientas T0 de forma automática — siempre detección, nunca instalación silenciosa (ver `docs/normas/GATES.md`).
 
 ## Instalación (1 comando)
 
@@ -124,7 +131,7 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 ├── AGENTS.md                # reglas inmutables para contributors
 ├── docs/normas/              # ético, gates, alcance, evidencias, legal
 ├── docs/estandares/           # checklist normativo + plantilla de informe
-├── references/                # execution-tiers, t0-commands, dispatch, schemas/
+├── references/                # execution-tiers, t0-commands, dispatch, cache, schemas/
 ├── templates/scope.txt         # plantilla de Gate C
 ├── scripts/metrics.ps1          # findings/USD, %T0, tendencia
 ├── install.ps1 / install.sh      # -Check / -Uninstall

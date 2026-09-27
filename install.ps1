@@ -1,4 +1,6 @@
 ﻿# Loki — Instalador Windows (PowerShell 5.1 safe, BOM UTF-8)
+# Cobertura de SO: Windows (PowerShell 5.1+ y pwsh 7+ cross-platform).
+# Linux/macOS/BSD/WSL → usar install.sh (POSIX puro).
 # Instala la skill en opencode y Claude Code. Detecta herramientas T0 y delegación.
 # Uso:
 #   .\install.ps1                    # instalar (default all)

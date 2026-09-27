@@ -69,6 +69,15 @@
         }
       }
     },
-    "coverage_note": { "type": "string" }
+    "coverage_note": { "type": "string" },
+    "cache": {
+      "type": "object",
+      "description": "Auditabilidad de uso de cache/memoria entre corridas — ver references/cache.md",
+      "properties": {
+        "tools_cache_hit": { "type": "boolean" },
+        "scan_cache_hit": { "type": "boolean" },
+        "scan_cache_ttl_h": { "type": "number" }
+      }
+    }
   }
 }
