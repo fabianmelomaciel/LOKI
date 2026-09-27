@@ -34,6 +34,31 @@ jobs:
           echo "manifest=$MANIFEST_VERSION skill.md=$SKILL_VERSION"
           test "$MANIFEST_VERSION" = "$SKILL_VERSION"
 
+  skill-lint:
+    name: skill-lint (dogfooding — Loki pasa su propio preflight)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patrones BLOQUEO (references/skill-lint.md) en SKILL.md y dispatch.md
+        run: |
+          FAIL=0
+          check() {
+            if grep -REiq "$1" SKILL.md references/dispatch.md; then
+              echo "BLOQUEO: $1"
+              FAIL=1
+            fi
+          }
+          check 'curl[^|]*\|[[:space:]]*(ba)?sh'
+          check 'wget[^|]*\|[[:space:]]*(ba)?sh'
+          check 'eval[^\n]*base64|FromBase64String|IEX[[:space:]]*\('
+          check 'rm[[:space:]]+-r[f]?[[:space:]]+(/~|\$HOME|/etc)'
+          check 'bash[[:space:]]+-i.*>&.*dev/tcp|nc[^\n]*[[:space:]]-e[[:space:]]'
+          check 'NOPASSWD'
+          check '\.ssh/authorized_keys'
+          check 'sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}'
+          check 'ignore[[:space:]]+(previous|prior|above)[[:space:]]+instructions'
+          exit $FAIL
+
   install-check-windows:
     name: install.ps1 -Check (Windows)
     runs-on: windows-latest

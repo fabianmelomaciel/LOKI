@@ -21,7 +21,7 @@ Correr siempre en **local** (Docker), nunca contra una instancia pública compar
 1. Levantar el target local: `docker run -p 3000:3000 bkimminich/juice-shop` (u otro).
 2. Correr Loki en modo `standard` contra `http://localhost:3000` con Gates A-E cumplidos (target propio = autorización trivial, documentarlo igual en `scope.txt`).
 3. Registrar la salida de `scripts/metrics.ps1` tal cual (no editar a mano): `wall_clock_s`, `cost_usd`, `findings_by_phase`, `% hallazgos T0 gratis`, findings/USD.
-4. **Precisión:** comparar `vulnerabilities.json` contra la lista de retos/CVEs conocidos del target → calcular verdaderos positivos, falsos positivos, falsos negativos (recall/precisión, no solo conteo).
+4. **Precisión (automatizada):** `powershell -File scripts/score.ps1 -Findings <ruta>/vulnerabilities.json -GroundTruth references/groundtruth/juice-shop.json` → `precision`, `recall`, `f1` (+ `uncovered_known`/`unmatched_findings` para revisión manual). El ground truth es un **starter subset** — ampliarlo con el scoreboard del target fijo (misma versión Docker) antes de publicar números; un match por CWE sin hint puede ser otro hallazgo.
 5. Repetir 3 corridas (varianza de LLM) y reportar mediana, no una sola corrida.
 
 ## Qué reportar

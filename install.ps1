@@ -29,6 +29,10 @@ if ($ManifestContent -notmatch 'LOKI_FILES="([^"]+)"') {
     throw "loki.manifest.sh: no se pudo leer LOKI_FILES"
 }
 $FileList = $Matches[1] -split '\s+' | Where-Object { $_ -ne "" }
+if ($ManifestContent -notmatch 'LOKI_CMD_LIST="([^"]+)"') {
+    throw "loki.manifest.sh: no se pudo leer LOKI_CMD_LIST"
+}
+$CmdList = $Matches[1] -split '\s+' | Where-Object { $_ -ne "" }
 
 $DestRoots = @()
 if ($Target -eq "all" -or $Target -eq "opencode") {
@@ -36,6 +40,15 @@ if ($Target -eq "all" -or $Target -eq "opencode") {
 }
 if ($Target -eq "all" -or $Target -eq "claude") {
     $DestRoots += (Join-Path $env:USERPROFILE ".claude\skills")
+}
+
+# Destinos de slash-commands (fuente: .opencode/commands/ y .claude/commands/ del repo)
+$CmdTargets = @()
+if ($Target -eq "all" -or $Target -eq "opencode") {
+    $CmdTargets += @{ Src = Join-Path $Src ".opencode\commands"; Dst = Join-Path $env:USERPROFILE ".config\opencode\commands" }
+}
+if ($Target -eq "all" -or $Target -eq "claude") {
+    $CmdTargets += @{ Src = Join-Path $Src ".claude\commands"; Dst = Join-Path $env:USERPROFILE ".claude\commands" }
 }
 
 function Get-FileHash256($path) {
@@ -68,19 +81,40 @@ function Test-Sync($DestRoot) {
         Write-Host ("  [MISS]  " + $Dest + " — no instalada")
         return $false
     }
-    $srcSkill = Join-Path $Src "SKILL.md"
-    $dstSkill = Join-Path $Dest "SKILL.md"
-    $h1 = Get-FileHash256 $srcSkill
-    $h2 = Get-FileHash256 $dstSkill
-    if ($h1 -eq $h2) {
+    $drift = @()
+    foreach ($f in $FileList) {
+        $srcPath = Join-Path $Src $f
+        if (-not (Test-Path $srcPath)) { continue }
+        if (Test-Path $srcPath -PathType Container) {
+            $dstTree = Join-Path $Dest $f
+            foreach ($sf in (Get-ChildItem -Path $srcPath -Recurse -File)) {
+                $rel = $sf.FullName.Substring((Get-Item $srcPath).FullName.Length).TrimStart('\', '/')
+                $df = Join-Path $dstTree $rel
+                if (-not (Test-Path $df)) { $drift += "falta: $f/$rel" }
+                elseif ((Get-FileHash256 $sf.FullName) -ne (Get-FileHash256 $df)) { $drift += "difiere: $f/$rel" }
+            }
+            if (Test-Path $dstTree) {
+                $dstBase = (Get-Item $dstTree).FullName
+                foreach ($dfx in (Get-ChildItem -Path $dstTree -Recurse -File)) {
+                    $rel = $dfx.FullName.Substring($dstBase.Length).TrimStart('\', '/')
+                    if (-not (Test-Path (Join-Path $srcPath $rel))) { $drift += "extra (posible inyeccion): $f/$rel" }
+                }
+            }
+        } else {
+            $df = Join-Path $Dest $f
+            if (-not (Test-Path $df)) { $drift += "falta: $f" }
+            elseif ((Get-FileHash256 $srcPath) -ne (Get-FileHash256 $df)) { $drift += "difiere: $f" }
+        }
+    }
+    if ($drift.Count -eq 0) {
         Write-Host ("  [SYNC]  " + $Dest)
         return $true
     }
-    # Detectar versión instalada
+    $drift | Select-Object -First 8 | ForEach-Object { Write-Host ("  [DRIFT] " + $_) }
     $installed = ""
-    $first = Get-Content $dstSkill -TotalCount 5 | Out-String
+    $first = Get-Content (Join-Path $Dest "SKILL.md") -TotalCount 5 | Out-String
     if ($first -match "version:\s*(\S+)") { $installed = $Matches[1] }
-    Write-Host ("  [DRIFT] " + $Dest + " — instalada v" + $installed + " vs repo v" + $SkillVersion + " → re-ejecutá install.ps1")
+    Write-Host ("  [DRIFT] " + $Dest + " — " + $drift.Count + " archivo(s) alterado(s)/faltante(s), instalada v" + $installed + " vs repo v" + $SkillVersion + " → re-ejecutá install.ps1")
     return $false
 }
 
@@ -91,6 +125,42 @@ function Uninstall-Skill($DestRoot) {
         Write-Output ("  [DEL]   " + $Dest)
     } else {
         Write-Output ("  [SKIP]  " + $Dest + " no existe")
+    }
+}
+
+function Install-Cmds {
+    foreach ($t in $CmdTargets) {
+        if (-not (Test-Path $t.Src)) { continue }
+        if (-not (Test-Path $t.Dst)) { New-Item -ItemType Directory -Path $t.Dst -Force | Out-Null }
+        foreach ($f in $CmdList) {
+            $srcFile = Join-Path $t.Src $f
+            if (Test-Path $srcFile) { Copy-Item $srcFile (Join-Path $t.Dst $f) -Force }
+        }
+        Write-Output ("  OK -> " + $t.Dst + "  (slash-commands)")
+    }
+}
+
+function Test-CmdSync {
+    $drift = @()
+    foreach ($t in $CmdTargets) {
+        foreach ($f in $CmdList) {
+            $srcFile = Join-Path $t.Src $f
+            $dstFile = Join-Path $t.Dst $f
+            if (-not (Test-Path $srcFile)) { continue }
+            if (-not (Test-Path $dstFile)) { $drift += "comando falta: $dstFile" }
+            elseif ((Get-FileHash256 $srcFile) -ne (Get-FileHash256 $dstFile)) { $drift += "comando difiere: $dstFile" }
+        }
+    }
+    foreach ($d in $drift) { Write-Host ("  [DRIFT] " + $d) }
+    return ($drift.Count -eq 0)
+}
+
+function Uninstall-Cmds {
+    foreach ($t in $CmdTargets) {
+        foreach ($f in $CmdList) {
+            $dstFile = Join-Path $t.Dst $f
+            if (Test-Path $dstFile) { Remove-Item -Force $dstFile; Write-Output ("  [DEL]   " + $dstFile) }
+        }
     }
 }
 
@@ -105,6 +175,7 @@ if ($Uninstall) {
         Uninstall-Skill $dr
         $i++
     }
+    Uninstall-Cmds
     Write-Output ""
     exit 0
 }
@@ -118,6 +189,7 @@ if ($Check) {
         if (-not (Test-Sync $dr)) { $allOk = $false }
         $i++
     }
+    if (-not (Test-CmdSync)) { $allOk = $false }
     # Delegación SkillGrid
     Write-Output ""
     Write-Output "[delegacion] SkillGrid skills:"
@@ -141,6 +213,7 @@ foreach ($dr in $DestRoots) {
     Install-Skill $dr
     $i++
 }
+Install-Cmds
 
 # Matriz de herramientas T0
 Write-Output ""

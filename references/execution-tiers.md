@@ -18,7 +18,9 @@ Ver `references/t0-commands.md`:
 Subagentes flash/Haiku (~1/3 de Sonnet):
 - Dedup (clave: CWE+file+line), supresión de falsos positivos (Chesterton's fence)
 - Normalización a `references/schemas/vulnerabilities.schema.json`
-- **Prompts-cervecía:** `references/dispatch.md` (con 5 gates + Gate E verbatim)
+- **Digest obligatorio:** SARIF/JSON grandes pasan por `scripts/digest-sarif.ps1` (→ `{rule,file,line,level,snippet≤10}`) antes de subirlos al contexto — enforcement de la regla "nunca dumps"
+- **Re-run incremental:** si existe `vulnerabilities.json` previo del mismo target → `scripts/delta.ps1`; solo hallazgos `new`/`fixed` escalan a T2/informe, `unchanged` no re-gasta tokens
+- **Prompts-cervecía:** `references/dispatch.md` (con 5 gates + Gate E verbatim) + preflight `references/skill-lint.md` antes de delegar una skill ajena
 - Nunca dumps de archivos al contexto (snippet ≤10 líneas)
 
 ## T2 — PROFUNDO (solo donde importa)

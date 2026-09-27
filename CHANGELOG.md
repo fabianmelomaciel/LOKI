@@ -2,6 +2,22 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.1.0] — 2026-09-27
+
+Segunda ola: endurecimiento de integridad + benchmark medible. Deliberación `agente-ideas` (consejo A/B/C, ranking B>A>C).
+
+### Added
+- **Skill-lint preflight** (`references/skill-lint.md` + job CI dogfooding): 15 patrones (BLOQUEO/WARN) antes de delegar skills ajenas, score 0-100, cache TTL 24h — patrón SkillSpector (26.1% de skills del ecosistema tienen vulnerabilidades).
+- **Slash-commands** `/loki-audit` y `/loki-scan` (`.opencode/commands/` + `.claude/commands/`, wrappers delgados que solo invocan SKILL.md — anti-drift), instaladas/desinstaladas/verificadas por ambos instaladores (`LOKI_CMD_LIST` en `loki.manifest.sh`).
+- **Scorer de benchmark** `scripts/score.ps1` + starter ground truth `references/groundtruth/juice-shop.json` → precision/recall/F1 reproducibles (automatiza el paso 4 de `docs/BENCHMARK.md`).
+- **Digest SARIF** `scripts/digest-sarif.ps1` (SARIF grande → JSON compacto con snippet ≤10 líneas, enforcement de la regla T1 "nunca dumps").
+- **Delta incremental** `scripts/delta.ps1` (re-runs: solo hallazgos `new`/`fixed` escalan a T2/informe — memoria tipo PentAGI sin pgvector).
+
+### Fixed (seguridad — verificado en código por el consejo)
+- `install.sh --check`: **fail-closed** — aborta si no hay `sha256sum`/`shasum` (antes devolvía `nohash` y `"nohash" == "nohash"` reportaba SYNC sin verificar nada).
+- `-Check` de ambos instaladores: ahora compara SHA-256 de **todos** los archivos de `LOKI_FILES` y detecta **archivos extra** en la instalación (antes solo SKILL.md — cualquier mutación de `references/`, `scripts/` o `docs/` pasaba como SYNC).
+- `SKILL.md`: `CODEX.md` pasa a ser **data sujeta a Gate E** leída **después** de la Ley de Hierro (antes "aplicá antes de arrancar" precedía a los 5 gates → vector de inyección indirecta sobre un archivo gitignored). Flujo de ejecución reordenado (parsear → gates → CODEX).
+
 ## [1.0.0] — 2026-09-26
 
 Primer release público. Creado y mantenido por **Lic. Fabián Melo**.

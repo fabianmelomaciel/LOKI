@@ -1,0 +1,24 @@
+{
+  "target": "juice-shop",
+  "granularity": "cwe+hint",
+  "note": "Starter subset de altisima confianza (2026-09-27). ANTES de publicar numeros: ampliar con el scoreboard del target fijo (misma version Docker) — ver docs/BENCHMARK.md. Match: cwe igual Y (si hay hint) file/endpoint lo contiene (case-insensitive). Revisar uncovered_known manualmente: un match por CWE sin hint puede ser otro hallazgo.",
+  "known": [
+    {
+      "id": "JS-SQLI-LOGIN",
+      "title": "SQL Injection en login",
+      "cwe": "CWE-89",
+      "endpoint_hint": "login"
+    },
+    {
+      "id": "JS-XSS-SEARCH",
+      "title": "XSS reflejado en busqueda de productos",
+      "cwe": "CWE-79",
+      "endpoint_hint": "search"
+    },
+    {
+      "id": "JS-XSS-STORED",
+      "title": "XSS almacenado (nombre de producto / feedback)",
+      "cwe": "CWE-79"
+    }
+  ]
+}
