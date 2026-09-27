@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  secrets-scan:
+    name: Gitleaks (dogfooding — Loki no puede fallar su propio T0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  validate-schemas:
+    name: Validar JSON schemas + sync versión
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JSON válido (run.schema.json, vulnerabilities.schema.json)
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('references/schemas/run.schema.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('references/schemas/vulnerabilities.schema.json','utf8'))"
+      - name: Versión SKILL.md == loki.manifest.sh
+        run: |
+          MANIFEST_VERSION=$(sed -n 's/.*LOKI_VERSION="\([^"]*\)".*/\1/p' loki.manifest.sh)
+          SKILL_VERSION=$(sed -n 's/^version:[[:space:]]*//p' SKILL.md | head -1)
+          echo "manifest=$MANIFEST_VERSION skill.md=$SKILL_VERSION"
+          test "$MANIFEST_VERSION" = "$SKILL_VERSION"
+
+  install-check-windows:
+    name: install.ps1 -Check (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar y verificar SYNC
+        shell: pwsh
+        run: |
+          .\install.ps1
+          .\install.ps1 -Check
+
+  install-check-unix:
+    name: install.sh --check (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar y verificar SYNC
+        run: |
+          chmod +x install.sh
+          ./install.sh
+          ./install.sh --check

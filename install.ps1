@@ -17,7 +17,18 @@ param(
 $ErrorActionPreference = "Stop"
 $Src = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillName = "loki"
-$SkillVersion = "1.0.0"
+
+# Fuente única de versión + lista de archivos (sync con install.sh) — ver loki.manifest.sh
+$ManifestPath = Join-Path $Src "loki.manifest.sh"
+$ManifestContent = Get-Content $ManifestPath -Raw
+if ($ManifestContent -notmatch 'LOKI_VERSION="([^"]+)"') {
+    throw "loki.manifest.sh: no se pudo leer LOKI_VERSION"
+}
+$SkillVersion = $Matches[1]
+if ($ManifestContent -notmatch 'LOKI_FILES="([^"]+)"') {
+    throw "loki.manifest.sh: no se pudo leer LOKI_FILES"
+}
+$FileList = $Matches[1] -split '\s+' | Where-Object { $_ -ne "" }
 
 $DestRoots = @()
 if ($Target -eq "all" -or $Target -eq "opencode") {
@@ -26,12 +37,6 @@ if ($Target -eq "all" -or $Target -eq "opencode") {
 if ($Target -eq "all" -or $Target -eq "claude") {
     $DestRoots += (Join-Path $env:USERPROFILE ".claude\skills")
 }
-
-# Lista canónica de archivos (fuente única — mantener en sync con install.sh)
-$FileList = @(
-    "SKILL.md", "README.md", "LICENSE", "SECURITY.md",
-    "docs", "references", "templates", "scripts"
-)
 
 function Get-FileHash256($path) {
     (Get-FileHash -Path $path -Algorithm SHA256).Hash.ToLower()
