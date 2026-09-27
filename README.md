@@ -179,6 +179,15 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 
+## Mejoras recientes (v1.1.0 → v1.2.0): normas, leyes y cumplimiento mundial
+
+- **`/loki` interactivo**: sin argumentos detecta tu contexto (¿repo git y su origin?, ¿stack?, ¿URL/ruta/IP?) y ofrece menú de opciones — pentest completo (postura ofensiva tipo hack-audit/Strix/Shannon), `scan`, `quick`, `standard`, `deep`, `hack-audit`, estático, ayuda y cancelar. Con argumento arranca directo. Disponible en **opencode, Claude Code y Gemini CLI** (`.gemini/commands/*.toml`), instalado/desinstalado/verificado por ambos instaladores.
+- **Informe listo para reparar**: cada hallazgo exige `remediation` concreto + PoC reproducible (schema obligatorio).
+- **Cumplimiento normativo en cada informe (§7)**: ISO/IEC 27001:2022 Annex A obligatorio por hallazgo + **leyes de datos personales de todo el mundo** — Uruguay **Ley 18.331**, GDPR (UE), LGPD (Brasil), CCPA (California), PIPEDA, APPI, PDPA, POPIA y homólogas, con artículos, plazos de notificación (GDPR 72 h) y remediación vinculada → [`references/leyes-datos-personales.md`](references/leyes-datos-personales.md) (referencia, no asesoría legal — ver [`docs/normas/LEGALES.md`](docs/normas/LEGALES.md)).
+- **Benchmark medible**: `scripts/score.ps1` (precision/recall/F1 contra ground truth), `digest-sarif.ps1` (dumps grandes → snippets), `delta.ps1` (hallazgos new/fixed entre corridas).
+- **Skill-lint preflight** (15 patrones BLOQUEO/WARN) + job CI dogfooding; instaladores **fail-closed**: sin `sha256sum`/`shasum` → abortan, y `-Check` compara SHA-256 de todos los archivos + detecta fuentes/destinos alterados.
+- **Slash-commands**: `/loki` (interactivo) y `/loki-scan` (T0 gratis $0) como wrappers delgados de la skill — los 5 gates siguen siendo inmutables.
+
 ## Contribuir
 
 Guía paso a paso para PRs: [`CONTRIBUTING.md`](CONTRIBUTING.md). Los 5 gates, la regla "no exploit no report" y los límites de rate son **inmutables** (ver `AGENTS.md`) — todo lo demás, PRs bienvenidas.

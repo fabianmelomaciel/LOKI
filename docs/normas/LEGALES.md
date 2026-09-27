@@ -7,7 +7,8 @@ Loki ejecuta técnicas de seguridad ofensiva. **Usarla contra sistemas sin autor
 Este proyecto se distribuye **tal cual**, sin garantía de idoidoneidad ni aptitud para un fin particular. En máxima permitida por la ley aplicable, sus autores no asumen responsabilidad por daños derivados del uso o uso indebido de la herramienta, incluidos daños a sistemas, datos o consecuencias legales del operador.
 
 ## Alcance del operador
-- El operador es responsable de: obtener autorización, definir scope, cumplir la ley local/internacional (incluida protección de datos — GDPR/LOPD u homólogas), y de la revisión humana de todo informe LLM.
+- El operador es responsable de: obtener autorización, definir scope, cumplir la ley local/internacional (protección de datos personales: en Uruguay **Ley 18.331**; en la UE **GDPR**; y homólogas de todo el mundo — LGPD, CCPA, PIPEDA, APPI, PDPA, POPIA…, ver `references/leyes-datos-personales.md`), y de la revisión humana de todo informe LLM.
+- Los informes de Loki citan normativa como **referencia de cumplimiento** (ISO/IEC 27001:2022 + leyes de datos personales) — **no constituyen asesoría legal**; la verificación de vigencia y montos corresponde a un asesor jurídico.
 - Loki **no** es un servicio de pentest certificado; los informes no sustituyen evaluaciones oficiales (PTES/OSSTMM) realizadas por profesionales acreditados sin más marco.
 
 ## Licencia

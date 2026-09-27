@@ -2,6 +2,25 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.2.0] — 2026-09-27
+
+Slash-command unificado `/loki` interactivo + soporte Gemini CLI + cumplimiento normativo mundial. Decisión del CEO.
+
+### Added
+- **Comando `/loki` interactivo** (renombra a `/loki-audit`): sin argumentos **detecta el contexto automáticamente** (repo git + origin, stack por manifiestos, clasificación URL/ruta/IP/proyecto actual) y ofrece **menú numerado** con postura ofensiva default *pentest completo* (tipo hack-audit/Strix/Shannon — intentar hackear el target con PoC), más `scan`/`quick`/`standard`/`deep`/`hack-audit`/`estático`/`h` ayuda/`x` cancelar; confirma target + Gates A/B antes de arrancar. Con argumento → banner + arranque directo (tier `quick`). Disponible en `.opencode/commands/`, `.claude/commands/` y `.gemini/commands/`.
+- **Soporte Gemini CLI**: nuevo destino `~/.gemini/commands/` con formato TOML v1 (`description` + `prompt`, args `{{args}}` — ruta y formato verificados en la doc oficial de google-gemini/gemini-cli). Target nuevo: `-Target gemini` / `./install.sh gemini`.
+- **`references/leyes-datos-personales.md`**: mapeo hallazgo→régimen de protección de datos de todo el mundo — **Uruguay Ley 18.331**, GDPR, LGPD, CCPA, PIPEDA, APPI, PDPA, POPIA, Leyes 25.326/1581/29733/21.719, DPDP India — con artículos, plazos de notificación (GDPR 72 h), sanciones (con flags de verificación) y tabla por tipo de hallazgo. Disclaimer: referencia, no asesoría legal.
+- **Informe §7 "Cumplimiento normativo"** (`docs/estandares/informe-maestro.md`): ISO/IEC 27001:2022 Annex A agregado + leyes de datos personales aplicables por jurisdicción + estándares sectoriales (27701, PCI-DSS, NIST).
+- **README §"Mejoras recientes (v1.1.0 → v1.2.0)"**: todo lo implementado — comandos interactivos, benchmark, skill-lint, instaladores fail-closed y cumplimiento normativo mundial.
+- `docs/normas/LEGALES.md`: ampliado con Ley 18.331 y régimen mundial aplicable.
+
+### Changed
+- `LOKI_CMD_LIST` pasa a **stems sin extensión** (`loki loki-scan`): cada motor aporta su propia extensión (.md opencode/claude, .toml gemini) — fuente única de nombres en `loki.manifest.sh`.
+- Instaladores: `-Check` de slash-commands ahora es **fail-closed** para fuentes — si un stem de `LOKI_CMD_LIST` no existe en el repo, `-Check` reporta DRIFT (antes `continue` silencioso: archivo de repo borrado pasaba como SYNC y quedaba huérfano en la instalación).
+
+### Notas
+- Excluidos por no tener ruta verificada en docs oficiales: Codex CLI (`~/.codex/prompts` está deprecado — su doc oficial recomienda skills, ya cubierto), Cursor/Windsurf/Copilot (sin fuente verificada en esta sesión).
+
 ## [1.1.0] — 2026-09-27
 
 Segunda ola: endurecimiento de integridad + benchmark medible. Deliberación `agente-ideas` (consejo A/B/C, ranking B>A>C).

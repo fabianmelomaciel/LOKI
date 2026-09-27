@@ -5,6 +5,7 @@
 # Uso:
 #   .\install.ps1                    # instalar (default all)
 #   .\install.ps1 -Target opencode   # solo opencode
+#   .\install.ps1 -Target gemini     # solo slash-commands de Gemini CLI (sin skill)
 #   .\install.ps1 -Check             # verificar sincronía repo ↔ instalación
 #   .\install.ps1 -Uninstall         # desinstalar de todos los destinos
 
@@ -42,13 +43,17 @@ if ($Target -eq "all" -or $Target -eq "claude") {
     $DestRoots += (Join-Path $env:USERPROFILE ".claude\skills")
 }
 
-# Destinos de slash-commands (fuente: .opencode/commands/ y .claude/commands/ del repo)
+# Destinos de slash-commands (fuente: .opencode/commands/, .claude/commands/ y
+# .gemini/commands/ del repo). Cada motor aporta su extensión: .md / .md / .toml
 $CmdTargets = @()
 if ($Target -eq "all" -or $Target -eq "opencode") {
-    $CmdTargets += @{ Src = Join-Path $Src ".opencode\commands"; Dst = Join-Path $env:USERPROFILE ".config\opencode\commands" }
+    $CmdTargets += @{ Src = Join-Path $Src ".opencode\commands"; Dst = Join-Path $env:USERPROFILE ".config\opencode\commands"; Ext = ".md" }
 }
 if ($Target -eq "all" -or $Target -eq "claude") {
-    $CmdTargets += @{ Src = Join-Path $Src ".claude\commands"; Dst = Join-Path $env:USERPROFILE ".claude\commands" }
+    $CmdTargets += @{ Src = Join-Path $Src ".claude\commands"; Dst = Join-Path $env:USERPROFILE ".claude\commands"; Ext = ".md" }
+}
+if ($Target -eq "all" -or $Target -eq "gemini") {
+    $CmdTargets += @{ Src = Join-Path $Src ".gemini\commands"; Dst = Join-Path $env:USERPROFILE ".gemini\commands"; Ext = ".toml" }
 }
 
 function Get-FileHash256($path) {
@@ -130,11 +135,15 @@ function Uninstall-Skill($DestRoot) {
 
 function Install-Cmds {
     foreach ($t in $CmdTargets) {
-        if (-not (Test-Path $t.Src)) { continue }
         if (-not (Test-Path $t.Dst)) { New-Item -ItemType Directory -Path $t.Dst -Force | Out-Null }
-        foreach ($f in $CmdList) {
-            $srcFile = Join-Path $t.Src $f
-            if (Test-Path $srcFile) { Copy-Item $srcFile (Join-Path $t.Dst $f) -Force }
+        foreach ($s in $CmdList) {
+            $name = $s + $t.Ext
+            $srcFile = Join-Path $t.Src $name
+            if (-not (Test-Path $srcFile)) {
+                Write-Output ("  [WARN] comando fuente no existe en repo: " + $srcFile)
+                continue
+            }
+            Copy-Item $srcFile (Join-Path $t.Dst $name) -Force
         }
         Write-Output ("  OK -> " + $t.Dst + "  (slash-commands)")
     }
@@ -143,10 +152,11 @@ function Install-Cmds {
 function Test-CmdSync {
     $drift = @()
     foreach ($t in $CmdTargets) {
-        foreach ($f in $CmdList) {
-            $srcFile = Join-Path $t.Src $f
-            $dstFile = Join-Path $t.Dst $f
-            if (-not (Test-Path $srcFile)) { continue }
+        foreach ($s in $CmdList) {
+            $name = $s + $t.Ext
+            $srcFile = Join-Path $t.Src $name
+            $dstFile = Join-Path $t.Dst $name
+            if (-not (Test-Path $srcFile)) { $drift += "comando fuente no existe en repo: $srcFile"; continue }
             if (-not (Test-Path $dstFile)) { $drift += "comando falta: $dstFile" }
             elseif ((Get-FileHash256 $srcFile) -ne (Get-FileHash256 $dstFile)) { $drift += "comando difiere: $dstFile" }
         }
@@ -157,8 +167,8 @@ function Test-CmdSync {
 
 function Uninstall-Cmds {
     foreach ($t in $CmdTargets) {
-        foreach ($f in $CmdList) {
-            $dstFile = Join-Path $t.Dst $f
+        foreach ($s in $CmdList) {
+            $dstFile = Join-Path $t.Dst ($s + $t.Ext)
             if (Test-Path $dstFile) { Remove-Item -Force $dstFile; Write-Output ("  [DEL]   " + $dstFile) }
         }
     }

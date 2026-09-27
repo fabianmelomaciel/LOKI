@@ -54,6 +54,12 @@
 2. {Plan corto plazo}
 3. {Mejoras estructurales}
 
+## 7. Cumplimiento normativo
+- **ISO/IEC 27001:2022 Annex A:** resumen agregado de los controles afectados (el detalle por hallazgo ya va en §3, obligatorio — `references/iso27001-mapping.md`). {n} hallazgos → controles {A.xx,…} afectados.
+- **Leyes de datos personales aplicables** (solo si el hallazgo toca PII y el target opera/esas personas; ver `references/leyes-datos-personales.md`): {jurisdicción → régimen: Uruguay Ley 18.331 · GDPR UE · LGPD Brasil · CCPA California · …} con artículo de seguridad/notificación y plazo (GDPR 72 h).
+- **Estándares sectoriales si aplica:** ISO/IEC 27701 (privacidad), PCI-DSS (datos de tarjetas), NIST SP 800-53/CSF 2.0.
+- Pie obligatorio: *referencia normativa — no asesoría legal; verificar vigencia con asesor (LEGALES.md).*
+
 ---
 *Revisión humana requerida antes de cerrar. Salida LLM puede contener alucinaciones.*
 *Generado por Loki — no exploit, no report.*

@@ -13,7 +13,7 @@ for arg in "$@"; do
     case "$arg" in
         --check) MODE="check" ;;
         --uninstall) MODE="uninstall" ;;
-        opencode|claude|all) TARGET="$arg" ;;
+        opencode|claude|gemini|all) TARGET="$arg" ;;
     esac
 done
 
@@ -34,14 +34,19 @@ case "$TARGET" in
     all|claude) DEST_ROOTS="$DEST_ROOTS $HOME/.claude/skills" ;;
 esac
 
-# Destinos de slash-commands (fuente: .opencode/commands/ y .claude/commands/ del repo)
+# Destinos de slash-commands (fuente: .opencode/commands/, .claude/commands/ y
+# .gemini/commands/ del repo). Cada motor aporta su extensión: .md / .md / .toml
 OCMD=""
 CCMD=""
+GCMD=""
 case "$TARGET" in
     all|opencode) OCMD="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/commands" ;;
 esac
 case "$TARGET" in
     all|claude) CCMD="$HOME/.claude/commands" ;;
+esac
+case "$TARGET" in
+    all|gemini) GCMD="$HOME/.gemini/commands" ;;
 esac
 
 hash256() {
@@ -123,16 +128,26 @@ install_cmds() {
     if [ -n "$OCMD" ]; then
         mkdir -p "$OCMD"
         for f in $CMD_LIST; do
-            if [ -f "$SRC/.opencode/commands/$f" ]; then cp "$SRC/.opencode/commands/$f" "$OCMD/$f"; fi
+            if [ -f "$SRC/.opencode/commands/$f.md" ]; then cp "$SRC/.opencode/commands/$f.md" "$OCMD/$f.md"
+            else echo "  [WARN] comando fuente no existe en repo: .opencode/commands/$f.md"; fi
         done
         echo "  OK -> $OCMD  (slash-commands)"
     fi
     if [ -n "$CCMD" ]; then
         mkdir -p "$CCMD"
         for f in $CMD_LIST; do
-            if [ -f "$SRC/.claude/commands/$f" ]; then cp "$SRC/.claude/commands/$f" "$CCMD/$f"; fi
+            if [ -f "$SRC/.claude/commands/$f.md" ]; then cp "$SRC/.claude/commands/$f.md" "$CCMD/$f.md"
+            else echo "  [WARN] comando fuente no existe en repo: .claude/commands/$f.md"; fi
         done
         echo "  OK -> $CCMD  (slash-commands)"
+    fi
+    if [ -n "$GCMD" ]; then
+        mkdir -p "$GCMD"
+        for f in $CMD_LIST; do
+            if [ -f "$SRC/.gemini/commands/$f.toml" ]; then cp "$SRC/.gemini/commands/$f.toml" "$GCMD/$f.toml"
+            else echo "  [WARN] comando fuente no existe en repo: .gemini/commands/$f.toml"; fi
+        done
+        echo "  OK -> $GCMD  (slash-commands)"
     fi
 }
 
@@ -140,15 +155,25 @@ check_cmds() {
     local f rc=0
     if [ -n "$OCMD" ]; then
         for f in $CMD_LIST; do
-            if [ ! -f "$OCMD/$f" ]; then echo "  [DRIFT] comando falta: $OCMD/$f"; rc=1
-            elif [ "$(hash256 "$SRC/.opencode/commands/$f")" != "$(hash256 "$OCMD/$f")" ]; then echo "  [DRIFT] comando difiere: $OCMD/$f"; rc=1
+            if [ ! -f "$SRC/.opencode/commands/$f.md" ]; then echo "  [DRIFT] comando fuente no existe en repo: .opencode/commands/$f.md"; rc=1
+            elif [ ! -f "$OCMD/$f.md" ]; then echo "  [DRIFT] comando falta: $OCMD/$f.md"; rc=1
+            elif [ "$(hash256 "$SRC/.opencode/commands/$f.md")" != "$(hash256 "$OCMD/$f.md")" ]; then echo "  [DRIFT] comando difiere: $OCMD/$f.md"; rc=1
             fi
         done
     fi
     if [ -n "$CCMD" ]; then
         for f in $CMD_LIST; do
-            if [ ! -f "$CCMD/$f" ]; then echo "  [DRIFT] comando falta: $CCMD/$f"; rc=1
-            elif [ "$(hash256 "$SRC/.claude/commands/$f")" != "$(hash256 "$CCMD/$f")" ]; then echo "  [DRIFT] comando difiere: $CCMD/$f"; rc=1
+            if [ ! -f "$SRC/.claude/commands/$f.md" ]; then echo "  [DRIFT] comando fuente no existe en repo: .claude/commands/$f.md"; rc=1
+            elif [ ! -f "$CCMD/$f.md" ]; then echo "  [DRIFT] comando falta: $CCMD/$f.md"; rc=1
+            elif [ "$(hash256 "$SRC/.claude/commands/$f.md")" != "$(hash256 "$CCMD/$f.md")" ]; then echo "  [DRIFT] comando difiere: $CCMD/$f.md"; rc=1
+            fi
+        done
+    fi
+    if [ -n "$GCMD" ]; then
+        for f in $CMD_LIST; do
+            if [ ! -f "$SRC/.gemini/commands/$f.toml" ]; then echo "  [DRIFT] comando fuente no existe en repo: .gemini/commands/$f.toml"; rc=1
+            elif [ ! -f "$GCMD/$f.toml" ]; then echo "  [DRIFT] comando falta: $GCMD/$f.toml"; rc=1
+            elif [ "$(hash256 "$SRC/.gemini/commands/$f.toml")" != "$(hash256 "$GCMD/$f.toml")" ]; then echo "  [DRIFT] comando difiere: $GCMD/$f.toml"; rc=1
             fi
         done
     fi
@@ -159,12 +184,17 @@ uninstall_cmds() {
     local f
     if [ -n "$OCMD" ]; then
         for f in $CMD_LIST; do
-            if [ -f "$OCMD/$f" ]; then rm -f "$OCMD/$f"; echo "  [DEL]   $OCMD/$f"; fi
+            if [ -f "$OCMD/$f.md" ]; then rm -f "$OCMD/$f.md"; echo "  [DEL]   $OCMD/$f.md"; fi
         done
     fi
     if [ -n "$CCMD" ]; then
         for f in $CMD_LIST; do
-            if [ -f "$CCMD/$f" ]; then rm -f "$CCMD/$f"; echo "  [DEL]   $CCMD/$f"; fi
+            if [ -f "$CCMD/$f.md" ]; then rm -f "$CCMD/$f.md"; echo "  [DEL]   $CCMD/$f.md"; fi
+        done
+    fi
+    if [ -n "$GCMD" ]; then
+        for f in $CMD_LIST; do
+            if [ -f "$GCMD/$f.toml" ]; then rm -f "$GCMD/$f.toml"; echo "  [DEL]   $GCMD/$f.toml"; fi
         done
     fi
 }
