@@ -2,6 +2,11 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.4] — 2026-09-27
+
+### Added
+- Roadmap: ítem recalibrar `token_estimate` — el valor declarado en el frontmatter de `SKILL.md` (`input: 4200`) parece subestimado, una medición cruda de caracteres ya lo supera. Sugerido en el consejo `agente-ideas` de v1.6.1, agregado a pedido del CEO.
+
 ## [1.6.3] — 2026-09-27
 
 ### Added
