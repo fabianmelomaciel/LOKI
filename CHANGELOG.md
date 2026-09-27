@@ -2,6 +2,15 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.9.0] — 2026-09-27
+
+T3 (explotación dirigida) pasa a ser 100% nativo: deja de depender de instalar/pinear un motor externo. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — 3 hallazgos `bloqueantes`: el mecanismo de instalación del motor externo nunca instalaba el binario real, solo copiaba un archivo de instrucciones; adoptar el modo cloud del motor externo para resolver la dependencia de Docker habría implicado subir código del target a un tercero, en contra de la regla inmutable de no exfiltrar datos; su flujo de facturación automática rompía el control de presupuesto duro de Loki). El CEO pidió ir un paso más allá de la síntesis del consejo: eliminar la dependencia externa por completo en vez de repararla, y resolvió así el pedido original de compatibilidad total entre sistemas operativos — sin binario ni Docker que instalar, T3 corre igual en cualquier SO que ya corre el resto de Loki.
+
+### Changed
+- T3 pasa de "motor externo opt-in con pin de versión" a subagentes T2 encadenados (recon → exploit → post-exploit) sobre cada hallazgo `critical`/`high`, con el mismo límite de 5 concurrentes y el mismo `budget.json.cap_usd` de `deep` ($10 duro). Nuevo prompt `T3-explotación` en `references/dispatch.md`, mismo patrón de gates verbatim que T1/T2.
+- `references/schemas/run.schema.json`: se quita el campo `externals[]` (sin motor externo, sin `ref`/`sha256` que registrar).
+- Se elimina `references/strix-pin.sha256` (sin pin que verificar).
+
 ## [1.8.0] — 2026-09-27
 
 Indicador de progreso durante corridas `quick`/`standard`/`deep`: Loki imprime una línea de estado al empezar y cerrar cada fase con duración real, en vez de callar hasta el informe final. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — 1 hallazgo `bloqueante`: el canal de progreso no tenía regla de sanitización propia, a diferencia de `informe.html` que sí la exige explícitamente).

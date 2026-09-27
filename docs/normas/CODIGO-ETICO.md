@@ -5,7 +5,7 @@
 2. **Mínima intrusión.** La intervención mínima necesaria para probar el PoC; nada más.
 3. **Mínima exposición.** No exponer datos de terceros, usuarios ni infraestructura más allá de lo estrictamente necesario para la evidencia.
 4. **Proporcionalidad.** La intensidad del test es proporcional al riesgo acordado y al entorno (siempre no productivo).
-5. **No exploit, no report.** Solo hallazgos con proof-of-concept reproducible (hereda Strix y Shannon).
+5. **No exploit, no report.** Solo hallazgos con proof-of-concept reproducible.
 6. **Transparencia.** Toda intervención queda documentada en la bitácora propia del scan; nada se oculta.
 
 ## Prohibiciones absolutas

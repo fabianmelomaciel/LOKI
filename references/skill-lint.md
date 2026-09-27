@@ -33,4 +33,4 @@ Escaneo de patrones peligrosos ANTES de delegar o cargar una skill ajena (SkillG
 - Score 0–100 (arranca 100): −30 por patrón BLOQUEO distinto, −5 por WARN distinto, −15 si hay scripts adjuntos.
 - Umbral: score < 85 → WARN en informe/`run.json`; cualquier BLOQUEO → **no delegar** esa skill en esta sesión (reportar al operador con ruta + patrón).
 - Registrar en `run.json`: `delegation_lint: [{skill, path, score, bloqueos, warns}]`.
-- El lint NO reemplaza el pin de Strix (`references/strix-pin.sha256`) — lo complementa para el resto de la cadena de delegación.
+- El lint cubre toda la cadena de delegación de skills externas (SkillGrid); ver `## DELEGACIÓN` en `SKILL.md` para la lista completa.

@@ -1,6 +1,6 @@
 # Loki — Mapeo CWE → ISO/IEC 27001:2022 Annex A (referencia rápida T1/T2)
 
-> Ninguna herramienta de pentesting con IA relevada (Strix, Shannon, CAI, PentestGPT) mapea
+> Ninguna herramienta de pentesting con IA relevada (CAI, PentestGPT, entre otras) mapea
 > hallazgos a un control Annex A de forma nativa en su capa open source — es el diferenciador
 > de Loki. Tabla de consulta rápida; si el CWE no aparece, usar el control más cercano por
 > categoría y dejarlo explícito en el campo `finding` ("iso27001 aproximado por categoría X").

@@ -28,10 +28,11 @@ Sonnet/Pro: lógica de negocio, authz/IDOR, crypto, síntesis del informe.
 - **Obligatorio:** todo `critical`/`high` pasa por T2 (prompt T2-verify de `references/dispatch.md`) antes del informe.
 - Merge/dedup central en el orquestador.
 
-## T3 — EXTERNO (solo `deep`, opt-in, pin obligatorio)
-- **Strix:** `npx skills add usestrix/strix@b0866244 --skill strix-pentest` → verificar `sha256sum` contra `references/strix-pin.sha256` **antes** de ejecutar (mismatch o archivo vacío → STOP + confirmación humana, ver SKILL.md T3) → registrar `ref`+`sha256` en `run.json.externals[]` → `strix -n -t <target> --scan-mode deep --max-budget 10`.
-- Importar hallazgos Strix → dedup CWE+file+line → sumar `cost_usd` al total.
-- **Shannon:** NO integrado (Docker); solo hereda Gate A.
+## T3 — EXPLOTACIÓN DIRIGIDA (solo `deep`, 100% nativo)
+- Sin binarios/paquetes externos: corre igual en Windows, Linux y macOS porque reusa los mismos subagentes `task` de T1/T2 (nada de Docker ni CLI de terceros que pinear).
+- Prompt `T3-explotación` de `references/dispatch.md`, encadenado por hallazgo `critical`/`high`: recon dirigido → explotación controlada (rate ≤5 req/s, no destructiva) → post-explotación de bajo impacto (solo para probar alcance, nunca persistencia/pivoting fuera de scope).
+- Máximo 5 subagentes concurrentes. Dedup contra `vulnerabilities.json` existente por CWE+file+line. Sin PoC reproducible → `unconfirmed`, no se reporta ("no exploit, no report").
+- Presupuesto sale del mismo `budget.json.cap_usd` de `deep` ($10 duro) — sin `cost_usd` externo que sumar.
 
 ## Modos, techos y budget
 | Modo | Duración | Alcance | Techo (`budget.json.cap_usd`) |

@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.8.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.9.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -24,7 +24,7 @@
 
 Loki es una **skill** (formato `SKILL.md`, el estándar que ya leen Claude Code, OpenCode, Gemini CLI y — con cobertura reducida, sin shell real — Cursor) que convierte a tu agente de IA en un orquestador de pentesting real: escanea con herramientas gratuitas primero, escala a razonamiento profundo solo donde importa, y **nunca** reporta un hallazgo sin prueba de concepto reproducible.
 
-No reinventa escáneres. Orquesta Semgrep, Trivy, Gitleaks, TruffleHog, Checkov, Bandit, nmap, nuclei, ffuf y (opcional) [Strix](https://github.com/usestrix/strix) — con el gate de autorización que [Shannon](https://github.com/KeygraphHQ/shannon) popularizó, pero sin pedirte Docker.
+No reinventa escáneres. Orquesta Semgrep, Trivy, Gitleaks, TruffleHog, Checkov, Bandit, nmap, nuclei, ffuf y explotación dirigida nativa (T3) con gate de autorización obligatorio — sin pedirte Docker, sin ningún binario de terceros que instalar.
 
 ```
 ⚠️  Loki ejecuta ataques REALES con efectos mutativos.
@@ -54,8 +54,6 @@ No estamos solos en esto, y no pretendemos serlo. Estas son las referencias que 
 
 | Proyecto | Qué aporta | Qué le falta (que Loki sí trae) |
 |---|---|---|
-| [**Strix**](https://github.com/usestrix/strix) (~32.8k★) | Agentes de explotación real, "no exploit no report" | Sin cascada de costo T0→T3, sin mapeo normativo nativo |
-| [**Shannon**](https://github.com/KeygraphHQ/shannon) | Gate de autorización, 5 fases estilo OWASP | Requiere Docker; no corre nativo dentro del IDE |
 | **CAI** (Cybersecurity AI) | Framework de agentes para CTF/red-team | Enfocado en investigación, no en informes de compliance |
 | **PentestGPT** | Guía de pentest conversacional sobre un LLM | Sin ejecución real de herramientas, sin PoC obligatoria |
 | [**Xalgorix**](https://github.com/xalgorix/xalgorix) | Metodología de 22 fases, telemetría en vivo, CVSS por hallazgo | Self-hosted con infraestructura propia (no un `SKILL.md` que corra dentro del IDE); sin cascada de costo T0→T3 |
@@ -122,14 +120,14 @@ Además de la skill, el instalador copia los comandos `/loki` (menú interactivo
 | **T0-activo** | nuclei (allowlist), nmap, ffuf, nikto | **$0** | A+B+C+D+E |
 | **T1 barato** | Subagentes flash/Haiku — triage y dedup | ~⅓ de Sonnet | tras T0 |
 | **T2 profundo** | Sonnet — lógica de negocio, authz/IDOR, informe | Solo donde importa | — |
-| **T3 externo** | Strix, opt-in con pin de versión | `deep` únicamente | C+D + presupuesto |
+| **T3 nativo** | Subagentes T2 encadenados (recon→exploit→post-exploit), sin dependencias externas | `deep` únicamente | C+D + presupuesto |
 
 | Modo | Duración | Techo | Qué hace |
 |------|----------|-------|----------|
 | `scan` | ≤1 min | **$0** (sin LLM) | Solo T0-pasivo, salida cruda sin dedup — para CI/pre-commit |
 | `quick` (default) | ≤5 min | $0.10 | T0-pasivo + triage + síntesis |
 | `standard` | ~30 min | $2 | + T0-activo + subagentes en paralelo |
-| `deep` | horas | $10 hard cap | + Strix / explotación real |
+| `deep` | horas | $10 hard cap | + explotación dirigida nativa (T3) |
 
 Cualquier modo acepta `--dry-run`: corre la Fase 1 (recon, stack, scope) y lista los comandos T0/T1/T2/T3 que correría, sin ejecutar nada — $0, ningún gate D queda satisfecho por el preview.
 
@@ -179,7 +177,7 @@ Loki resuelve por cadena — nombre → `$SKILLGRID` → ruta absoluta → T0-on
 - `audit-loop` — corregir → re-auditar
 - `supply-chain-auditor`, `prompt-injection-guard`
 
-**Strix** = opcional en modo `deep`, pin de versión obligatorio. **Shannon** = no integrado (requiere Docker), solo hereda su gate de autorización.
+**T3 (explotación dirigida)** = nativo en modo `deep`, sin binarios ni paquetes de terceros.
 
 ## Estándares que mapea cada hallazgo
 
@@ -197,7 +195,6 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 
 - [ ] Agentes especializados de *host-hardening* por SO: revisión de registro/servicios en Windows, `systemd`/permisos en Linux, `launchd`/entitlements en macOS.
 - [ ] Reglas dedicadas de auditoría de red interna contra un servidor propio (más allá de nmap/nuclei genéricos ya soportados en T0-activo).
-- [ ] Integración opcional de Shannon sin requerir Docker.
 - [ ] Benchmark publicado (metodología ya definida en [`docs/BENCHMARK.md`](docs/BENCHMARK.md), falta la corrida real contra Juice Shop/DVWA).
 - [ ] Demo visual embebida (instrucciones listas en [`docs/DEMO.md`](docs/DEMO.md), falta grabarla).
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.

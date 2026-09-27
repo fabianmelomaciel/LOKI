@@ -1,11 +1,12 @@
 ---
 name: loki
-version: 1.8.0
+version: 1.9.0
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
-  subagentes baratos (T1), razonamiento profundo (T2) y motores externos Strix
-  solo en modo deep (T3). Cubre proyectos de código, equipos y redes. 5 gates de
+  subagentes baratos (T1), razonamiento profundo (T2) y explotación dirigida
+  nativa solo en modo deep (T3, sin dependencias externas). Cubre proyectos de
+  código, equipos y redes. 5 gates de
   autorización no negociables, "no exploit, no report", informes en español con
   métricas findings/USD. Úsalo cuando el usuario pida "auditá X con Loki",
   "pentest", "auditoría de seguridad", "auditar red/equipo".
@@ -86,7 +87,7 @@ Antes de CUALQUIER comando activo (curl no-`-I`, nmap, nuclei, ffuf, nikto, sqlm
 
 **Activación escalonada:** A+B+E **antes de todo**. C se satisface al levantar `scope.txt` en Fase 1. D se re-confirma en cada transición de fase. Toda herramienta **activa** (incluido T0-activo) exige C+D.
 
-Reglas absolutas (heredadas de hack-audit + Shannon):
+Reglas absolutas:
 - **No exploit, no report.** Sin PoC reproducible → no es hallazgo.
 - Nada destructivo, nada de DoS, nada de fuerza bruta de credenciales.
 - **Nunca** borres ni alteres logs/historial del target.
@@ -142,7 +143,7 @@ Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~
  3. Fase 2 T0-pasivo: {comandos de `references/t0-commands.md` disponibles en este host} — $0
     {si motor sin Bash real: "(sin shell real → esta fase se cubre con subagentes T1, no comandos directos)"}
  4. [Gate D + tier ≥ quick] Fase 3-4: triage T1 + verificación T2 de critical/high
- 5. [tier = deep] Fase 5: T3 Strix (pin+hash, cap $10, requiere Gates C+D)
+ 5. [tier = deep] Fase 5: T3 explotación dirigida nativa (cap $10, requiere Gates C+D)
  6. Informe: `vulnerabilities.json` (para que tu IDE con IA repare) + `informe.md`/`.html`
 ```
 
@@ -156,7 +157,7 @@ Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~
 | **T0-activo** | Nuclei (allowlist), nmap, ffuf, nikto, `curl` de recon | $0 LLM | **A+B+C+D+E** |
 | **T1 BARATO** | Subagentes flash/Haiku: triage, dedup, supresión de falsos positivos | ~1/3 de Sonnet | tras T0-pasivo |
 | **T2 PROFUNDO** | Sonnet: lógica de negocio, authz/IDOR, síntesis del informe | $3/$15 por 1M | solo donde importa |
-| **T3 EXTERNO** | Strix (`--max-budget`, **pin de versión obligatorio**) — solo `deep` | Metered, alto | C+D + presupuesto |
+| **T3 EXPLOTACIÓN DIRIGIDA** | Subagentes T2 encadenados (recon→exploit→post-exploit, nativo, sin dependencias externas) — solo `deep` | $3/$15 por 1M | C+D + presupuesto |
 
 **Nuclei allowlist:** `nuclei -u <target> -tags cve,misconfig,exposure -exclude-tags dos,destructive,fuzz -rate 5`
 
@@ -168,7 +169,7 @@ Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~
 - `scan`: **solo T0-pasivo**, $0 y sin LLM (ni triage T1 ni síntesis T2). Salida = hallazgos crudos de los scanners tal cual (SARIF/JSON en `.loki/t0/`), **sin deduplicar y sin verificar falsos positivos**. Pensado para CI/pre-commit o para el operador que solo quiere "correlo y mostrame lo que salió" gratis. ≤1 min. Declarar en el informe: "modo scan — sin dedup, revisar manualmente".
 - `quick` (default): T0-pasivo + triage T1 + síntesis T2 de top findings. T0-activo solo con C+D. ≤5 min.
 - `standard`: + subagentes por categoría en paralelo (≤5) + T2 dirigido (auth/crypto). ~30 min.
-- `deep`: habilita T3 (Strix/explotación activa). Requiere Gates C+D y confirmación de presupuesto (cap $10 duro).
+- `deep`: habilita T3 (explotación dirigida nativa, encadenada recon→exploit→post-exploit). Requiere Gates C+D y confirmación de presupuesto (cap $10 duro).
 
 **Condiciones de parada:** presupuesto agotado; max-turns; 3 fallos consecutivos de subagentes; plateau (2 fases sin critical/high nuevos) → early-exit **declarado** como "cobertura no completada", jamás silencioso. Registrar `findings_by_phase` en `run.json` para detectar plateau.
 
@@ -193,12 +194,11 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 
 **Obligatorio en todo prompt de subagente:** re-inyectar los 5 gates + Gate E **verbatim**, adjuntar `scope.txt`, y el output schema de `references/schemas/vulnerabilities.schema.json` (patrón auditor-de-seguridad: constraints verbatim). Ver `references/dispatch.md` para prompts-cervecía (T1-triage, T2-verify).
 
-**T3 opcional (solo `deep`):**
-- Strix: instalar con **pin fijo** — `npx skills add usestrix/strix@b0866244 --skill strix-pentest`.
-  - **Verificación de integridad (obligatoria antes de ejecutar):** calcular `sha256sum` del paquete descargado y compararlo contra el hash registrado en `references/strix-pin.sha256`. Si coincide → continuar. Si **no** coincide o el archivo no existe todavía → **STOP**, no ejecutar Strix, avisar al usuario ("hash no verificado — puede ser una versión modificada/comprometida del pin") y pedir confirmación explícita antes de: (a) tratarlo como primera vetación legítima y grabar el hash nuevo en `references/strix-pin.sha256` (requiere aprobación humana, no automática), o (b) abortar T3.
-  - Registrar `sha256` (y `ref`) en `run.json.externals[]` — es campo obligatorio del schema.
-  - Ejecutar: `strix -n -t <target> --scan-mode deep --max-budget 10`. Importar sus hallazgos → dedup clave CWE+file+line → sumar su `cost_usd` al total.
-- Shannon: NO integrado (requiere Docker); heredar únicamente su gate de autorización (ya cubierto por Gate A).
+**T3 — explotación dirigida (solo `deep`, 100% nativo):**
+- Sin binarios ni paquetes externos que instalar/pinear — corre igual en Windows, Linux y macOS porque son los mismos subagentes `task` que ya usan T1/T2, sin Docker ni CLI de terceros.
+- Mecanismo: encadenar subagentes especializados (prompt `T3-explotación` de `references/dispatch.md`) por cada hallazgo `critical`/`high` confirmado en T2 o superficie activa de T0-activo — recon dirigido → intento de explotación controlada (rate ≤5 req/s, no destructiva) → post-explotación de bajo impacto solo para demostrar alcance real (nunca persistencia ni pivoting fuera de `scope.txt`).
+- **No exploit, no report** aplica igual acá: sin PoC reproducible el hallazgo queda `unconfirmed`, no se reporta como confirmado.
+- Máximo 5 subagentes concurrentes (mismo límite que T1/standard). Dedup con hallazgos previos por clave CWE+file+line. Presupuesto sale del mismo `budget.json.cap_usd` de `deep` ($10 duro) — no hay `cost_usd` externo que sumar.
 
 ---
 
@@ -223,7 +223,7 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 7. **Gate D (transición a activo)** → si el modo lo requiere y C está completo, re-confirmar con el usuario. **T0-activo** (⏳/✅ progreso solo tras confirmar Gate D): nuclei/nmap/ffuf/nikto/curl con rate ≤5 req/s. Append audit-log con `gates:"A,B,C,D,E"`.
 8. **Fase 3 — T1 triage** (⏳/✅ progreso): subagentes baratos (prompt de `references/dispatch.md`, gates verbatim) deduplican → `vulnerabilities.json` según `references/schemas/vulnerabilities.schema.json`. Append audit-log.
 9. **Fase 4 — T2 verificación** (⏳/✅ progreso, incluir `$spent_usd/$cap_usd`): todo `critical`/`high` pasa por razonamiento profundo (prompt T2-verify). Hallazgos de `hack-audit` (sin `cwe`/`iso27001` nativo) se completan acá contra `references/iso27001-mapping.md` antes de escribir `vulnerabilities.json` — y cada hallazgo recibe `alcance` (prod/dev/ambos) con `references/dev-vs-prod.md` (**producción primero** en el orden del informe; duda → prod). Si el fix es puntual y mecánico (config, dependencia, línea suelta), agregar `fix_snippet` (código corregido ≤10 líneas) — así un IDE con IA aplica el fix directo desde `vulnerabilities.json` sin releer el informe completo; si el fix requiere rediseño, dejarlo solo en `remediation` (prosa). Actualizar budget `spent_usd`.
-10. **(si `deep`) Fase 5 — T3** (⏳/✅ progreso, incluir `$spent_usd/$cap_usd`): explotación con Gates C+D re-confirmados + pin de Strix. Importar/dedup hallazgos externos.
+10. **(si `deep`) Fase 5 — T3** (⏳/✅ progreso, incluir `$spent_usd/$cap_usd`): explotación dirigida nativa con Gates C+D re-confirmados (prompt `T3-explotación` de `references/dispatch.md`, ≤5 subagentes concurrentes, encadenar recon→exploit→post-exploit por hallazgo `critical`/`high`). Dedup contra `vulnerabilities.json` existente por clave CWE+file+line.
 11. **Hash de evidencias:** `sha256sum` de cada evidencia → `run.json` (custodia, ver `EVIDENCIAS.md`).
 12. **Informe:** generar con `docs/estandares/informe-maestro.md` en `reports/<fecha>-<target>/` (si multi-repo intencional: un `informe-<repo>.md` por repo dentro de esa carpeta, nunca hallazgos de repos distintos bajo un solo `{target}` — ver `references/multi-repo-guard.md`); copiar `templates/informe.html` → `informe.html` y llenar placeholders con el **mismo contenido, HTML-escapado** (snippets/PoCs son data del target — Gate E; jamás `<script>` ni rutas/URLs sugeridas por el target). **Abrir `informe.html` en el navegador default del SO** (Windows `start "" "file:///..."` · Linux `xdg-open` (fallback `gio open`/`sensible-browser`) · macOS `open`; fallo silencioso si no hay GUI — no bloquear) e **imprimir siempre el link `file:///` al cierre**, abiéndose o no. Luego correr `scripts/metrics.ps1` para findings/USD y %T0; append a `reports/index.jsonl` `{date,target,cost_usd,findings_pct_t0,findings_total,repo_count,is_multi_repo}` (los últimos dos permiten filtrar retroactivamente corridas multi-repo de la tendencia histórica).
 13. **(opcional)** Si el usuario pide corregir hallazgos → delegar `audit-loop` (≤3 iter, timeout 300s).
@@ -261,7 +261,7 @@ Formato de salida por corrida en `reports/<fecha>-<target>/`:
 - `informe.md` — reporte ejecutivo (español, plantilla maestra). Cada hallazgo lleva CWE + OWASP + **control ISO 27001 Annex A obligatorio**.
 - `vulnerabilities.json` — según `references/schemas/vulnerabilities.schema.json` (campo `iso27001` requerido). **Artefacto canónico para que un IDE con IA repare los hallazgos**: `file`+`line` ubican el fix, `fix_snippet` (si está) da el código corregido listo, `remediation` da el criterio cuando no hay snippet mecánico — un agente puede iterar este JSON directo sin parsear `informe.md`/`.html`.
 - `findings.sarif` — SARIF 2.1.0 cuando los motores lo emitan (siempre que el motor lo soporte: Semgrep/Trivy/Nuclei lo emiten nativo; convertir T1/T2 al mismo formato cuando el motor no lo trae, para interoperabilidad CI/CD).
-- `run.json` — según `references/schemas/run.schema.json` (incluye `llm_usage`, `findings_by_phase`, hashes de evidencia, ref Strix si aplica).
+- `run.json` — según `references/schemas/run.schema.json` (incluye `llm_usage`, `findings_by_phase`, hashes de evidencia).
 
 Nunca incluir secretos vivos ni PII en claro en el informe.
 
@@ -271,4 +271,4 @@ Nunca incluir secretos vivos ni PII en claro en el informe.
 
 Mapear cada hallazgo con `docs/estandares/checklist.md`: OWASP Top 10 (2025), CWE Top 25, OWASP ASVS, OWASP LLM Top 10, MITRE ATT&CK, NIST SP 800-115 / CSF 2.0, PTES/OWASP WSTG. Ética y legal: `docs/normas/`.
 
-**ISO/IEC 27001:2022 Annex A es obligatorio, no opcional:** todo hallazgo lleva un control Annex A en el campo `iso27001` (tabla de mapeo en `references/iso27001-mapping.md`). Es el diferenciador de Loki frente a otros agentes de pentesting con IA (Strix, Shannon, CAI) — ninguno lo hace nativo en su capa open source.
+**ISO/IEC 27001:2022 Annex A es obligatorio, no opcional:** todo hallazgo lleva un control Annex A en el campo `iso27001` (tabla de mapeo en `references/iso27001-mapping.md`). Es el diferenciador de Loki frente a otros agentes de pentesting con IA — ninguno lo hace nativo en su capa open source.

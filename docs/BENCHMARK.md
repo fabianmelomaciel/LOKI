@@ -36,4 +36,4 @@ Guardar el `run.json` y `vulnerabilities.json` de cada corrida benchmark en `rep
 
 ## Comparación contra el ecosistema
 
-Strix, Shannon, CAI y PentestGPT no publican metodología de benchmark reproducible contra targets fijos con este nivel de detalle (recall/precisión, no solo "encontró N vulnerabilidades"). Si alguien corre este método contra el mismo target con otra herramienta, el resultado es comparable — esa es la intención.
+Otras herramientas de pentesting con IA no publican metodología de benchmark reproducible contra targets fijos con este nivel de detalle (recall/precisión, no solo "encontró N vulnerabilidades"). Si alguien corre este método contra el mismo target con otra herramienta, el resultado es comparable — esa es la intención.

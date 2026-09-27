@@ -60,19 +60,6 @@
         }
       }
     },
-    "externals": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["engine", "ref", "sha256"],
-        "properties": {
-          "engine": { "enum": ["strix"] },
-          "ref": { "type": "string" },
-          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "SHA-256 del paquete descargado, verificado contra el hash publicado antes de ejecutar — ver SKILL.md T3" },
-          "cost_usd": { "type": "number" }
-        }
-      }
-    },
     "coverage_note": { "type": "string" },
     "cache": {
       "type": "object",

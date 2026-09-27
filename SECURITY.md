@@ -17,6 +17,6 @@ Si descubrís una vulnerabilidad **en Loki itself** (por ejemplo: un gate de aut
 
 ## Supply Chain
 - Instaladores solo copian esta skill; no ejecutan `curl | bash`.
-- Dependencias externas (Strix) son **opt-in** y se instalan con **pin de versión obligatorio** (`@b0866244` o tag más reciente revisado); exigir revisión del diff del paquete antes de la primera ejecución y registrar el `ref` en `run.json.externals[]`.
+- T3 (explotación dirigida) es 100% nativo — sin binarios/paquetes de terceros que instalar, pinear ni auditar.
 - Las herramientas T0 se detectan con `which` y se listan; no se autoinstalan silenciosamente.
 - El instalador **no** copia `CODEX.md` (local-only, puede contener rutas internas).
