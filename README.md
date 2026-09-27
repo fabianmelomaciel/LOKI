@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.6.1-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.6.2-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -196,6 +196,7 @@ Loki hoy audita código, dependencias, secretos e infraestructura declarada (IaC
 - [ ] Integración opcional de Shannon sin requerir Docker.
 - [ ] Benchmark publicado (metodología ya definida en [`docs/BENCHMARK.md`](docs/BENCHMARK.md), falta la corrida real contra Juice Shop/DVWA).
 - [ ] Demo visual embebida (instrucciones listas en [`docs/DEMO.md`](docs/DEMO.md), falta grabarla).
+- [ ] Modo `--dry-run`: previsualizar qué comandos T0/T1/T2 se ejecutarían para el alcance dado, sin correr nada, para revisar antes de autorizar los gates.
 
 Si te interesa alguno de estos, el punto de entrada es `AGENTS.md` — PRs bienvenidas.
 

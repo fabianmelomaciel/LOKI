@@ -2,6 +2,11 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.2] — 2026-09-27
+
+### Added
+- Roadmap: ítem `--dry-run` — previsualizar qué comandos T0/T1/T2 se ejecutarían para el alcance dado, sin correr nada, para revisar antes de autorizar los gates. Sugerido en el consejo `agente-ideas` de v1.6.1, agregado a pedido del CEO.
+
 ## [1.6.1] — 2026-09-27
 
 Alineación de README tras auditoría de repo-hygiene (consejo `agente-ideas`, pregunta del CEO: "¿`.opencode`/`.gemini` son indispensables en GitHub? ¿el README está alineado? ¿qué le falta a la herramienta?"). Confirmado: los 3 directorios son indispensables (fuente de los slash-commands `/loki`/`/loki-scan`, copiados por `install.ps1`/`install.sh`) — no se tocaron. Se corrigió que el README nunca lo explicaba.
