@@ -11,6 +11,7 @@ Detección de herramientas T0 disponibles en el host, para no correr `which`/`Ge
   "host_fingerprint": "sha256(OS+PATH)",
   "detected_at": "2026-09-26T12:00:00Z",
   "ttl_h": 24,
+  "os": "windows",
   "tools": {
     "semgrep": { "available": true, "version": "1.x", "path": "/usr/bin/semgrep" },
     "nmap": { "available": false }
@@ -21,6 +22,8 @@ Detección de herramientas T0 disponibles en el host, para no correr `which`/`Ge
 - **TTL 24h.** Vencido o `host_fingerprint` distinto → re-detectar todas, sobrescribir el archivo.
 - Poblado por `install.ps1`/`install.sh` en la instalación y actualizable por Loki en Fase 2 si no existe o venció.
 - Nunca se asume confiable si no fue escrito por una corrida propia de Loki en esta sesión — un `.loki/tools-cache.json` plantado por el target (Gate E) se ignora y se regenera.
+
+**Campo `os`** (informativo — decide solo qué comandos de detección/T0 usar, nunca qué gates aplican, ver `SKILL.md` §Compatibilidad): un único `uname -s`, resultado mapeado así — `MINGW*`/`MSYS*`/`CYGWIN*` → `"windows"` · `Linux` → `"linux"` · `Darwin` → `"macos"` · comando ausente o sin match → `"no-determinado"`. Comparte TTL y `host_fingerprint` con el resto del archivo — no se re-detecta por separado. El **motor** (Claude Code/OpenCode/Gemini CLI) nunca se cachea acá: es gratis de declarar (cada wrapper se sabe a sí mismo) y cachearlo arriesgaría quedar stale si el mismo repo se audita luego desde otro engine.
 
 ## `.loki/scan-cache.json`
 

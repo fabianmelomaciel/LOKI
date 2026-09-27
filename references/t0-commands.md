@@ -1,6 +1,6 @@
 # Loki — Comandos canónicos T0 (fallback sin delegación a cyber-neo)
 
-Una línea por herramienta. Detectar con `which <tool>` antes de lanzar; ausentes → declarar en el informe. Los pasivos corren con Gates A+B+E; los activos **solo** con C+D y rate ≤5 req/s.
+Una línea por herramienta. Detectar antes de lanzar (según `os` cacheado, ver `references/cache.md`): `windows` → `Get-Command <tool> -ErrorAction SilentlyContinue`; `linux`/`macos`/`no-determinado` → `which <tool>`. No asumir `which` disponible solo porque el engine corre "Bash" — un engine puede exponer Bash vía shell nativo de Windows sin `which` en el PATH. Ausentes → declarar en el informe. Los pasivos corren con Gates A+B+E; los activos **solo** con C+D y rate ≤5 req/s.
 
 `<target>` acá ya pasó el guard multi-repo (`references/multi-repo-guard.md`) — es siempre la raíz de un único repo, nunca una carpeta padre con varios proyectos.
 

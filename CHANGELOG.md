@@ -2,6 +2,20 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.6.0] — 2026-09-27
+
+Conciencia de motor/SO en el menú interactivo: Loki ahora declara qué engine lo ejecuta y qué sistema operativo detectó antes de correr nada, y muestra la lista concreta de tareas que va a hacer. Deliberación `agente-ideas` (consejo A/B/C, veto de seguridad B — sin early-exit, ranking B>C>A), pedido del CEO ("debe entender que ide usa... consciente de esto... menú de preguntas claro e intuitivo... listar las tareas que va a realizar en pantalla").
+
+### Added
+- **Detección de motor y SO** (`SKILL.md` §Compatibilidad): motor se declara gratis por wrapper (cada `.claude/.opencode/.gemini` sabe qué engine lo carga, sin comando); SO se detecta con un único `uname -s` cacheado en `.loki/tools-cache.json.os` (mismo TTL 24h/`host_fingerprint` que la detección de herramientas T0) — mapeo `MINGW*/MSYS*/CYGWIN*`→Windows, `Linux`→Linux, `Darwin`→macOS, ausente→"no determinado".
+- **Regla dura explícita**: motor/SO deciden únicamente qué comandos T0 correr y cómo se ve el banner — nunca qué gates aplican. Cierra el riesgo bloqueante que levantó la perspectiva de seguridad del consejo (motor/SO no pueden convertirse en una vía para saltear los 5 gates).
+- **Banner "▶ Voy a ejecutar..."** en el banner canónico de `SKILL.md` (PARSEO DE INTENCIÓN): lista estática de las fases concretas que van a correr según tier/motor/SO, antes de lanzar nada — un solo lugar (no duplicado en los 3 wrappers, que siguen siendo "delgados").
+- **Gemini CLI** agregado a la tabla de compatibilidad de engines (README y `SKILL.md`) — ya tenía wrapper propio (`.gemini/commands/loki.toml`) pero no figuraba como first-class.
+- Campo `os` documentado en el schema de `.loki/tools-cache.json` (`references/cache.md`).
+
+### Fixed
+- `references/t0-commands.md` instruía detectar herramientas T0 con `which <tool>` sin importar el SO — falla silenciosa en Windows nativo sin Git Bash/WSL. Ahora es OS-aware: `Get-Command` en Windows, `which` en el resto (mismo criterio que ya usaba `install.ps1` vs `install.sh`, pero no estaba propagado a la detección en runtime).
+
 ## [1.5.0] — 2026-09-27
 
 Ronda de pulido: salida accionable para IDEs con IA, higiene de README (badge desincronizado, duplicación con CHANGELOG) e investigación de mercado repetida (Xalgorix, Pentest-Swarm-AI/PentestAgent, ecosistema skill-audit). Deliberación `agente-ideas`, pedido explícito del CEO ("mejora el proyecto lo mas que pueda... reduccion de tokens... que los IDE ia puedan repararlo").

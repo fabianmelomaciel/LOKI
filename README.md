@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.5.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.6.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -88,6 +88,7 @@ Loki red 192.168.1.0/24 scope=local
 |---|---|---|---|
 | **Claude Code** | ✅ | ✅ | First-class |
 | **OpenCode** | ✅ | ✅ | First-class |
+| **Gemini CLI** | ✅ | ✅ | First-class |
 | Cursor / otros lectores de `SKILL.md` | ❌ (o limitado) | ❌ | Compatible, cobertura reducida (todo escala a T1/T2) |
 
 Instaladores multiplataforma: `install.sh` (Linux/macOS/BSD/WSL — POSIX puro) e `install.ps1` (Windows, PowerShell 5.1+/pwsh). Ninguno instala herramientas T0 de forma automática — siempre detección, nunca instalación silenciosa (ver `docs/normas/GATES.md`).

@@ -9,10 +9,12 @@ Entrada: $ARGUMENTS
 - Directorio actual y ¿hay repo git? → `git rev-parse --show-toplevel` + `git remote get-url origin` (silenciá errores si no hay repo). **Si falla** (no es repo git): NO asumas el directorio actual como target candidato — buscá carpetas `.git` de primer/segundo nivel bajo el cwd (excluyendo `node_modules`); si hay ≥2 repos independientes, el candidato del banner es "ninguno (N repos detectados)" y el paso 3 exige elegir uno o confirmar multi-repo intencional — nunca se autocompleta con la carpeta padre entera (`references/multi-repo-guard.md`).
 - Stack → manifiesto en la raíz detectada (`package.json`, `composer.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, `pom.xml`, `Cargo.toml`, `*.csproj`): solo nombre/versión/deps top-level, vía Glob/Read.
 - Clasificá lo detectado: **URL** (http/https) · **ruta existente** en disco · **IP/red** · **"esta máquina"** · **nada**.
+- SO → leé `.loki/tools-cache.json.os` si existe y no venció (TTL 24h); si no, corré `uname -s` una vez (mapeo completo en `references/cache.md`). Motor: este wrapper siempre corre bajo **Claude Code** (dato fijo, sin detección).
 
 ### 2. Banner + menú — mostrá y ESPERÁ la respuesta
 ```
 🔐 Loki — detección automática
+├─ Motor: Claude Code · SO: {Windows | Linux | macOS | no determinado}
 ├─ Target candidato: {ruta | URL | IP | ninguno}
 ├─ Contexto: {repo → origin | stack detectado | no detectado}
 ├─ Tipo sugerido: {codigo | red | equipo | completo}
