@@ -6,23 +6,26 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   secrets-scan:
     name: Gitleaks (dogfooding — Loki no puede fallar su propio T0)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   validate-schemas:
-    name: Validar JSON schemas + sync versión
+    name: Validar JSON schemas + sync versión + token_estimate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: JSON válido (run.schema.json, vulnerabilities.schema.json)
         run: |
           node -e "JSON.parse(require('fs').readFileSync('references/schemas/run.schema.json','utf8'))"
@@ -35,12 +38,43 @@ jobs:
           echo "manifest=$MANIFEST_VERSION skill.md=$SKILL_VERSION readme_badge=$README_VERSION"
           test "$MANIFEST_VERSION" = "$SKILL_VERSION"
           test "$MANIFEST_VERSION" = "$README_VERSION"
+      - name: token_estimate sin drift >10% (scripts/token-audit.ps1)
+        shell: pwsh
+        run: ./scripts/token-audit.ps1
+
+  repo-sync:
+    name: Sync interno (tools ×2, wrappers, árbol README)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Listas T0 idénticas install.ps1 == install.sh (≥10 tools)
+        run: |
+          set -euo pipefail
+          ps_tools=$(grep -o '\$tools = @([^)]*)' install.ps1 | head -1 | sed 's/.*@("//; s/")$//' | tr ',' '\n' | tr -d ' "' | sort)
+          sh_tools=$(grep -o 'TOOLS="[^"]*"' install.sh | head -1 | sed 's/^TOOLS="//; s/"$//' | tr ' ' '\n' | sort)
+          ps_count=$(printf '%s\n' "$ps_tools" | grep -c . || true)
+          sh_count=$(printf '%s\n' "$sh_tools" | grep -c . || true)
+          echo "install.ps1=$ps_count tools | install.sh=$sh_count tools"
+          if [ "$ps_count" -lt 10 ] || [ "$sh_count" -lt 10 ]; then
+            echo "ERROR: parseo de tools vacío o incompleto (mínimo 10)"
+            exit 1
+          fi
+          diff <(printf '%s\n' "$ps_tools") <(printf '%s\n' "$sh_tools") || { echo "ERROR: listas T0 divergentes entre install.ps1 e install.sh"; exit 1; }
+      - name: Wrappers de engine en sync (literal de engine normalizado)
+        run: |
+          set -euo pipefail
+          norm() { sed 's/Claude Code/ENGINE/g; s/OpenCode/ENGINE/g; s/Gemini CLI/ENGINE/g' "$1"; }
+          diff <(norm .claude/commands/loki.md) <(norm .opencode/commands/loki.md) || { echo "ERROR: wrappers loki.md divergentes (Claude vs OpenCode)"; exit 1; }
+          cmp -s .claude/commands/loki-scan.md .opencode/commands/loki-scan.md || { echo "ERROR: wrappers loki-scan.md divergentes (Claude vs OpenCode)"; exit 1; }
+          echo "wrappers OK"
+      - name: README lista templates/informe.html
+        run: grep -q 'templates/informe.html' README.md
 
   skill-lint:
     name: skill-lint (dogfooding — Loki pasa su propio preflight)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Patrones BLOQUEO (references/skill-lint.md) en SKILL.md y dispatch.md
         run: |
           FAIL=0
@@ -65,7 +99,7 @@ jobs:
     name: install.ps1 -Check (Windows)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Instalar y verificar SYNC
         shell: pwsh
         run: |
@@ -79,7 +113,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Instalar y verificar SYNC
         run: |
           chmod +x install.sh

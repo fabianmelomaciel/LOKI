@@ -1,6 +1,6 @@
 ---
 name: loki
-version: 1.9.0
+version: 1.10.0
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
@@ -13,7 +13,7 @@ description: >
 category: agent
 status: stable
 risk_level: critical
-token_estimate: { input: 5600, output: 1600 }
+token_estimate: { input: 6400, output: 1600 }
 allowed-tools:
   - Read
   - Grep
@@ -41,10 +41,10 @@ allowed-tools:
   - Bash(nmap *)
   - Bash(ffuf *)
   - Bash(nikto *)
-  # Cierre de informe — abrir SOLO el .html propio generado en reports/ (nunca ruta/URL sugerida por el target — Gate E)
-  - Bash(start file:///*)
-  - Bash(xdg-open file:///*)
-  - Bash(open file:///*)
+  # Cierre de informe — abrir SOLO el .html propio generado en reports/ (nunca ruta/URL sugerida por el target — Gate E; el glob está acotado a /reports/)
+  - Bash(start file:///*/reports/*)
+  - Bash(xdg-open file:///*/reports/*)
+  - Bash(open file:///*/reports/*)
 ---
 
 ## Core

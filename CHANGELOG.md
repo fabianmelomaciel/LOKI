@@ -2,6 +2,28 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.10.0] — 2026-10-01
+
+Snapshot de mejora continua v1.9.0. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad: 3 hallazgos `bloqueantes` de la perspectiva B) → ranking 1º endurecimiento de T0/permisos, 2º FinOps de tokens, 3º sync de CI. CEO dio GO con P1-P6.
+
+### Added
+- **Validación de placeholders T0** (`references/t0-commands.md` + prefijo de `references/dispatch.md`): `<target>`/`<host-en-scope>` deben matchear `^[A-Za-z0-9.:/_-]+$` antes de ejecutar, siempre entrecomillados; `<wordlist>` solo ruta bajo el repo — cierra el hueco donde un string del target (dato Gate E) se convertía en código shell sin regla explícita.
+- **Job `repo-sync` en CI**: valida que las listas T0 de `install.ps1` e `install.sh` sean idénticas (≥10 tools, parseo con guarda de vacío), que los wrappers Claude↔OpenCode estén en sync (literal de engine normalizado, `loki-scan.md` byte a byte) y que el árbol del README liste `templates/informe.html`. `AGENTS.md` actualizado de "manual" a "manual + CI".
+- **`scripts/token-audit.ps1`** + step en CI: `token_estimate.input` del frontmatter sin drift >10% vs `chars/4` real de `SKILL.md`.
+- **`CODEX.deliberaciones.md`** (local-only): histórico de `## Deliberaciones` fuera del runtime de cada corrida.
+
+### Changed
+- **Globs de apertura de informe acotados** (`SKILL.md` allowed-tools): `Bash(start/xdg-open/open file:///*/reports/*)` en vez de `file:///*` — la prosa ya exigía "SOLO reports/", ahora el permission layer también.
+- **Alcance del rate limit inmutable documentado** (`references/t0-commands.md`): ≤5 req/s mide requests HTTP (nuclei/ffuf/nikto/curl); `nmap --max-rate` es paquetes/segundo, métrica distinta (si el CEO interpreque el límite inmutable como aplicable a pps, escalar decisión).
+- **CI supply chain**: `actions/checkout` y `gitleaks/gitleaks-action` pinnadas por SHA (obtenidos de la API de GitHub, commits firmados PGP) + `permissions: contents: read` a nivel workflow.
+- **`token_estimate` recalibrado** `5600 → 6400` (SKILL.md creció: 25,5K chars ≈ 6,4K tok).
+- **`CODEX.md` de 23.092 → 6.086 chars**: la sección `## Deliberaciones` (89% del archivo, ~4,250 tok) se movió al histórico con stub que preserva el ancla `^## Deliberaciones` que lee la skill de ideas.
+- **`.gitignore` trackeado por primera vez** (estaba sin `git add`: los clones nuevos perdían el guard de `reports//.loki/scope.txt` que exige AGENTS.md).
+
+### Fixed
+- Árbol del README: faltaba `templates/informe.html` (obligatorio en el flujo de informe) y `scripts/token-audit.ps1`.
+- Entrada de deliberación v1.3.0 vivía en §Mission Logs en vez de §Deliberaciones (movida al histórico).
+
 ## [1.9.0] — 2026-09-27
 
 T3 (explotación dirigida) pasa a ser 100% nativo: deja de depender de instalar/pinear un motor externo. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B — 3 hallazgos `bloqueantes`: el mecanismo de instalación del motor externo nunca instalaba el binario real, solo copiaba un archivo de instrucciones; adoptar el modo cloud del motor externo para resolver la dependencia de Docker habría implicado subir código del target a un tercero, en contra de la regla inmutable de no exfiltrar datos; su flujo de facturación automática rompía el control de presupuesto duro de Loki). El CEO pidió ir un paso más allá de la síntesis del consejo: eliminar la dependencia externa por completo en vez de repararla, y resolvió así el pedido original de compatibilidad total entre sistemas operativos — sin binario ni Docker que instalar, T3 corre igual en cualquier SO que ya corre el resto de Loki.
