@@ -203,7 +203,7 @@ if ($Check) {
     # Delegación SkillGrid
     Write-Output ""
     Write-Output "[delegacion] SkillGrid skills:"
-    $sgSkills = @("auditor-de-seguridad","cyber-neo","hack-audit","audit-loop","supply-chain-auditor","prompt-injection-guard")
+    $sgSkills = @("auditor-de-seguridad","cyber-neo","hack-audit","audit-loop","prompt-injection-guard")
     $sgRoots = @("$env:SKILLGRID", "C:\laragon\www\SkillGrid\skills")
     foreach ($s in $sgSkills) {
         $found = $false
@@ -246,7 +246,7 @@ if ($missing.Count -gt 0) {
 # Delegación SkillGrid
 Write-Output ""
 Write-Output "[delegacion] SkillGrid skills:"
-$sgSkills = @("auditor-de-seguridad","cyber-neo","hack-audit","audit-loop","supply-chain-auditor","prompt-injection-guard")
+$sgSkills = @("auditor-de-seguridad","cyber-neo","hack-audit","audit-loop","prompt-injection-guard")
 $sgRoots = @("$env:SKILLGRID", "C:\laragon\www\SkillGrid\skills")
 foreach ($s in $sgSkills) {
     $found = $false

@@ -1,0 +1,43 @@
+NOTICE — Atribuciones de terceros
+==================================
+
+Loki adapta MÉTODO (reescrito, sin copiar archivos ni código) de las siguientes
+fuentes. Se conservan sus licencias y se atribuye la autoría.
+
+1) anthropics/claude-code-security-review
+   - Fuente: https://github.com/anthropics/claude-code-security-review
+   - Licencia: MIT
+   - Adaptado: revisión acotada a diffs, umbral de confianza y filtro de falsos
+     positivos de alto ruido.
+
+2) elementalsouls/Claude-BugHunter
+   - Fuente: https://github.com/elementalsouls/Claude-BugHunter
+   - Autor: Sachin Sharma
+   - Licencia: MIT (código) + Creative Commons Attribution 4.0 International
+     (contenido/documentación) — https://creativecommons.org/licenses/by/4.0/
+   - Adaptado: Pre-Severity Gate, criterio Q6 ("impacto demostrado, no
+     técnicamente posible") e higiene de evidencia.
+   - Modificaciones: los textos se parafrasearon y acotaron al flujo de Loki;
+     no se copiaron skills, payloads ni el CLI del upstream.
+
+3) SnailSploit/Claude-Red
+   - Fuente: https://github.com/SnailSploit/Claude-Red
+   - Autor: Kai Aizen (SnailSploit)
+   - Licencia: MIT
+   - Adaptado: orden de los cinco vectores, anclaje CVSS y campos de
+     Estado/Retest del hallazgo.
+
+NO ADAPTADO
+
+4) Consensys/repo-security-review
+   - Fuente: https://github.com/Consensys/repo-security-review
+   - Licencia: no declarada (LICENSE ausente, HTTP 404 al momento de la
+     revisión).
+   - Uso: únicamente la idea general de separación *finder→judgment* en
+     clean-room. No se copió texto, código ni fases.
+
+Alcance de la adaptación
+
+No se importaron payloads, exploits, shellcode, evasión, C2, instaladores ni
+dependencias externas. Loki conserva su LICENSE con cláusula authorized-use only
+y sus 5 gates inmutables.

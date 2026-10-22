@@ -224,7 +224,7 @@ if [ "$MODE" = "check" ]; then
     echo ""
     echo "[delegación] SkillGrid skills:"
     SG_ROOTS="${SKILLGRID:-} ${SRC}/../SkillGrid/skills"
-    for s in auditor-de-seguridad cyber-neo hack-audit audit-loop supply-chain-auditor prompt-injection-guard; do
+    for s in auditor-de-seguridad cyber-neo hack-audit audit-loop prompt-injection-guard; do
         found=0
         for r in $SG_ROOTS; do
             [ -n "$r" ] && [ -f "$r/$s/SKILL.md" ] && found=1 && break
@@ -272,7 +272,7 @@ fi
 echo ""
 echo "[delegación] SkillGrid skills:"
 SG_ROOTS="${SKILLGRID:-} ${SRC}/../SkillGrid/skills"
-for s in auditor-de-seguridad cyber-neo hack-audit audit-loop supply-chain-auditor prompt-injection-guard; do
+for s in auditor-de-seguridad cyber-neo hack-audit audit-loop prompt-injection-guard; do
     found=0
     for r in $SG_ROOTS; do
         [ -n "$r" ] && [ -f "$r/$s/SKILL.md" ] && found=1 && break

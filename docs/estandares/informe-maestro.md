@@ -40,6 +40,7 @@
 - **Descripción:** {qué está mal y por qué importa}
 - **PoC (reproducible):** {request/comando/pasos exactos}
 - **Impacto:** {qué puede lograr un atacante}
+- **Estado:** {abierto | corregido | riesgo_aceptado} — **Retest:** {fecha + comando/pasos | pendiente}
 - **Remediación:** {fix concreto, no genérico}
 - **Fix rápido:** {fix_snippet si existe en vulnerabilities.json — código corregido ≤10 líneas; omitir esta línea si no aplica}
 - **Evidencia:** {hash SHA-256 + timestamp}

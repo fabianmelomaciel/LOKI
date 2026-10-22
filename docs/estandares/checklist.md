@@ -36,3 +36,13 @@
 - `docs/normas/LEGALES.md` — autorización y responsabilidad.
 - `docs/normas/EVIDENCIAS.md` — custodia y redacción.
 - RGPD/LOPD u homólogas — cuando haya PII en evidencias.
+
+## Atribución de métodos adaptados
+| Fuente | Licencia | Qué se adaptó (reescrito) |
+|--------|----------|---------------------------|
+| `anthropics/claude-code-security-review` | MIT | Revisión diff-scoped, umbral de confianza y filtro de alto ruido |
+| `elementalsouls/Claude-BugHunter` | MIT + CC BY 4.0 (contenido) | Pre-Severity Gate, Q6 de impacto demostrado e higiene de evidencia |
+| `SnailSploit/Claude-Red` | MIT | Orden de vectores, anclaje CVSS y Estado/Retest |
+| `Consensys/repo-security-review` | **sin licencia (404)** | Solo la idea *finder→judgment*, sin copia textual |
+
+Detalle y textos de licencia: `NOTICE`. No se importaron payloads, exploits ni dependencias.

@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.10.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.11.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -149,6 +149,7 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 
 ```
 ├── SKILL.md                # skill maestra (gates + routing + tiers)
+├── NOTICE                   # atribuciones MIT + CC BY 4.0 de métodos adaptados
 ├── .claude/commands/         # slash-commands /loki + /loki-scan para Claude Code (indispensable, copiado por install)
 ├── .opencode/commands/        # mismos comandos para OpenCode (indispensable, copiado por install)
 ├── .gemini/commands/           # mismos comandos para Gemini CLI, formato .toml (indispensable, copiado por install)
@@ -158,7 +159,7 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 ├── docs/estandares/           # checklist normativo + plantilla de informe
 ├── docs/BENCHMARK.md           # metodología de benchmark reproducible
 ├── docs/DEMO.md                 # cómo grabar la demo visual (asciinema/GIF)
-├── references/                # execution-tiers, t0-commands, dispatch, cache, schemas/
+├── references/                # execution-tiers, t0-commands, dispatch, cache, validation-gate, diff-review, schemas/
 ├── templates/scope.txt         # plantilla de Gate C
 ├── templates/informe.html       # plantilla de informe HTML (apertura automática)
 ├── scripts/metrics.ps1          # findings/USD, %T0, tendencia
@@ -177,7 +178,7 @@ Loki resuelve por cadena — nombre → `$SKILLGRID` → ruta absoluta → T0-on
 - `cyber-neo` — SCA/SAST/secretos/IaC (OWASP 2025 + CWE Top 25)
 - `hack-audit` — explotación real local/red
 - `audit-loop` — corregir → re-auditar
-- `supply-chain-auditor`, `prompt-injection-guard`
+- `cyber-neo` (cadena de suministro), `prompt-injection-guard`
 
 **T3 (explotación dirigida)** = nativo en modo `deep`, sin binarios ni paquetes de terceros.
 

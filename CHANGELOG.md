@@ -2,6 +2,24 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.11.0] — 2026-10-22
+
+Mejora incremental de los auditores de seguridad. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B: Consensys sin licencia, cadena de suministro sin pin y armamento ofensivo). Se adaptó **solo método reescrito** de Claude-BugHunter, Claude-Red y Anthropic security-review; no se importaron archivos, payloads ni dependencias.
+
+### Added
+- **`references/validation-gate.md`**: escala de confianza 1–10 (`<8` nunca es `confirmed`), Pre-Severity Gate para `critical`/`high`, campos `estado`/`retest` y regla de retracción.
+- **`references/diff-review.md`**: modo `--diff`/`--pr`, aislamiento finder→judgment, filtro de alto ruido y manejo de hallazgos `pre-existing`.
+- **`NOTICE`**: atribución MIT/CC BY 4.0 de las fuentes adaptadas y constancia de que Consensys (sin licencia) no se copió.
+
+### Changed
+- `references/dispatch.md`: T1/T2/T3 ahora exigen confianza justificada, `validation_status` e impacto demostrado (no "podría").
+- `SKILL.md`: modo diff en el parseo de intención, línea de validación/aislamiento en la cascada y `token_estimate` sin cambios.
+- `docs/estandares/informe-maestro.md`: cada hallazgo lleva `Estado` y `Retest`.
+- `docs/estandares/checklist.md`: tabla de atribución de métodos adaptados.
+
+### Fixed
+- Delegación rota de `supply-chain-auditor` (no existe en SkillGrid) → `cyber-neo` + `references/supply-chain.md`, con fallback T0 declarado.
+
 ## [1.10.0] — 2026-10-01
 
 Snapshot de mejora continua v1.9.0. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad: 3 hallazgos `bloqueantes` de la perspectiva B) → ranking 1º endurecimiento de T0/permisos, 2º FinOps de tokens, 3º sync de CI. CEO dio GO con P1-P6.

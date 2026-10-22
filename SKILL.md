@@ -1,6 +1,6 @@
 ---
 name: loki
-version: 1.10.0
+version: 1.11.0
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
@@ -125,6 +125,7 @@ Extraer de la entrada del usuario:
 3. **MODO DE EJECUCIÓN** — `scan` | `quick` (default) | `standard` | `deep`.
 4. **SCOPE** — inclusiones/exclusiones (o pedir `scope.txt`; copiar `templates/scope.txt` como base).
 5. **DRY-RUN** — flag ortogonal al tier (`--dry-run`, "solo mostrame qué harías", "preview sin ejecutar"): si está presente, el flujo corta antes de Fase 2 real — ver FLUJO DE EJECUCIÓN, paso 5.5.
+6. **DIFF** — flag ortogonal de alcance (`--diff`, `--pr`, "solo los cambios"): revisa únicamente archivos y líneas cambiadas, con aislamiento finder→judgment y filtro de alto ruido — ver `references/diff-review.md`.
 
 ```
 🔐 Loki
@@ -163,6 +164,8 @@ Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~
 
 **Reglas de escalada:** cada tier solo corre si el anterior no cubrió o el usuario pidió subir. Patrón obligatorio: T1 barato → verificación T2 de todo critical/high. Máximo **5 subagentes LLM concurrentes**. Antes de delegar `audit-loop`: exportar `SKILLGRID_LOOP_MAX_ITER=3` y `SKILLGRID_LOOP_TIMEOUT=300`.
 
+**Validación y aislamiento:** todo hallazgo pasa por `references/validation-gate.md` (confianza 1–10; <8 no es `confirmed`; `critical`/`high` pasan por Pre-Severity Gate). Finder y judgment corren en contextos separados: el subagente que encuentra no valida su propio hallazgo. Modo diff en `references/diff-review.md`.
+
 **Presupuesto (obligatorio):** crear `.loki/budget.json` al inicio `{mode, cap_usd, spent_usd: 0, max_turns: 20}`; incrementar `spent_usd` tras cada fase. Si `spent_usd > cap_usd*0.8` → solo T0+informe. Techos: quick $0.10 / standard $2 / deep $10.
 
 **Modos:**
@@ -183,7 +186,7 @@ Estimado: scan ≤1 min ($0, sin LLM) │ quick ≤5 min (~$0.10) │ standard ~
 | SCA/SAST/secretos/IaC | `cyber-neo` | nombre → `$SKILLGRID` → `../SkillGrid/skills/cyber-neo/SKILL.md` → absoluta |
 | Explotación real local/red | `hack-audit` (analizado y validado — no duplica auditor-de-seguridad/cyber-neo, ver `CODEX.md`) | nombre → `$SKILLGRID` → `../SkillGrid/skills/hack-audit/SKILL.md` → absoluta. **Ajustes obligatorios al invocar:** (1) inyectar `rate_limit: ≤5 req/s, backoff exponencial 1s→30s, máx 3 intentos` en el prompt (hack-audit no lo trae por defecto); (2) sus hallazgos pasan por T2-verify para completar `cwe`+`iso27001` antes de escribir `vulnerabilities.json` (su plantilla nativa no los incluye) |
 | Corregir→re-auditar | `audit-loop` | nombre → `$SKILLGRID` → `../SkillGrid/skills/audit-loop/SKILL.md` → absoluta |
-| Cadena de suministro | `supply-chain-auditor` | nombre → `$SKILLGRID` → `../SkillGrid/skills/supply-chain-auditor/SKILL.md` → absoluta |
+| Cadena de suministro | `cyber-neo` (`references/supply-chain.md`) | nombre → `$SKILLGRID` → `../SkillGrid/skills/cyber-neo/SKILL.md` → `references/supply-chain.md`; si no existe → T0 con `trivy`/`npm audit` y avisar en el informe |
 | Prompts/IA | `prompt-injection-guard` | nombre → `$SKILLGRID` → `../SkillGrid/skills/prompt-injection-guard/SKILL.md` → absoluta |
 
 Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\skills\<n>\SKILL.md`.
@@ -232,7 +235,7 @@ Ruta absoluta local (último recurso en este host): `C:\laragon\www\SkillGrid\sk
 ### Modo por tipo de objetivo
 - **`codigo`** → delegar `auditor-de-seguridad` + `cyber-neo` (siempre read-only sobre el target).
 - **`red`** → delegar `hack-audit` (puertos locales/SSH solo dentro de scope; Fase 0.5 de superficie completa si es "esta máquina"; guard de host propio aplica).
-- **`equipo`** → inventario de repos/miembros → `codigo` por repo + `supply-chain-auditor` + revisión de permisos/secretos compartidos; **sin** explotación contra personas.
+- **`equipo`** → inventario de repos/miembros → `codigo` por repo + cadena de suministro vía `cyber-neo` (`references/supply-chain.md`) + revisión de permisos/secretos compartidos; **sin** explotación contra personas.
 - **`completo`** → los tres anteriores en paralelo (máx 5 subagentes).
 
 ---
