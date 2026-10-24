@@ -12,6 +12,6 @@ Gracias por el interés. Antes de un PR:
    Si tocás versión o lista de archivos, editá solo `loki.manifest.sh` (fuente única) — nunca los instaladores directamente.
 4. **No commitees:** `reports/` (salvo `informe-ejemplo.md`), `.loki/`, `scope.txt`, secretos, evidencias crudas, ni `CODEX.md` (es local-only).
 5. **JSON de `references/schemas/` debe seguir siendo válido** — el CI lo valida (`node -e "JSON.parse(...)"`).
-6. Abrí el PR contra `main` con una descripción de qué cambia y por qué. El CI (gitleaks + schemas + install-check en Windows/Linux/macOS) tiene que pasar en verde.
+6. Abrí el PR contra `main` con una descripción de qué cambia y por qué. El CI (gitleaks, schemas + sync de versión + `token_estimate`, repo-sync, skill-lint con los 15 patrones, installer-sanity y scripts-smoke con `tests/fixtures/`, más install-check en Windows/Linux/macOS) tiene que pasar en verde.
 
 Dudas o vulnerabilidades encontradas en el propio Loki: ver [`SECURITY.md`](SECURITY.md).

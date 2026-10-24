@@ -1,0 +1,26 @@
+{
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "SQL Injection en login",
+      "cwe": "CWE-89",
+      "severity": "critical",
+      "tier": "t0-passive",
+      "status": "confirmed",
+      "endpoint": "/rest/user/login",
+      "file": "routes/login.ts",
+      "line": 42
+    },
+    {
+      "id": "F-004",
+      "title": "Header de seguridad ausente",
+      "cwe": "CWE-693",
+      "severity": "low",
+      "tier": "t0-passive",
+      "status": "confirmed",
+      "endpoint": "/",
+      "file": "server.ts",
+      "line": 3
+    }
+  ]
+}

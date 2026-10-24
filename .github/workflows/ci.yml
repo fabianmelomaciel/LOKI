@@ -75,24 +75,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - name: Patrones BLOQUEO (references/skill-lint.md) en SKILL.md y dispatch.md
+      - name: Patrones BLOQUEO + WARN (references/skill-lint.md) — alcance ampliado
         run: |
+          set -euo pipefail
+          # El catálogo (references/skill-lint.md) se auto-excluye: contiene los literales de los patrones.
+          FILES=$(ls SKILL.md references/*.md .claude/commands/*.md .opencode/commands/*.md .gemini/commands/*.toml install.sh install.ps1 loki.manifest.sh | grep -v '^references/skill-lint\.md$')
+          [ -n "$FILES" ] || { echo "ERROR: alcance de lint vacio"; exit 1; }
           FAIL=0
           check() {
-            if grep -REiq "$1" SKILL.md references/dispatch.md; then
-              echo "BLOQUEO: $1"
+            if grep -REiq "$1" $FILES; then
+              echo "BLOQUEO: $2"
+              grep -REin "$1" $FILES | head -5
               FAIL=1
             fi
           }
-          check 'curl[^|]*\|[[:space:]]*(ba)?sh'
-          check 'wget[^|]*\|[[:space:]]*(ba)?sh'
-          check 'eval[^\n]*base64|FromBase64String|IEX[[:space:]]*\('
-          check 'rm[[:space:]]+-r[f]?[[:space:]]+(/~|\$HOME|/etc)'
-          check 'bash[[:space:]]+-i.*>&.*dev/tcp|nc[^\n]*[[:space:]]-e[[:space:]]'
-          check 'NOPASSWD'
-          check '\.ssh/authorized_keys'
-          check 'sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}'
-          check 'ignore[[:space:]]+(previous|prior|above)[[:space:]]+instructions'
+          warn() {
+            if grep -REiq "$1" $FILES; then
+              echo "::warning::WARN: $2"
+              grep -REin "$1" $FILES | head -3
+            fi
+          }
+          check 'curl[^|]*\|[[:space:]]*(ba)?sh' '1 pipe a shell (curl)'
+          check 'wget[^|]*\|[[:space:]]*(ba)?sh' '2 pipe a shell (wget)'
+          check 'eval[^\n]*base64|FromBase64String|IEX[[:space:]]*\(' '3 eval/base64'
+          check 'rm[[:space:]]+-r[f]?[[:space:]]+(/~|\$HOME|/etc)' '4 rm destructivo'
+          check 'allowed-tools:.*Bash\((\*|rm|sudo|sh)([[:space:]]|\)|$)' '5a allowed-tools inline'
+          check '^[[:space:]]*-[[:space:]]+Bash\((\*|rm|sudo|sh)([[:space:]]|\)|$)' '5b allowed-tools en lista'
+          check 'curl[^\n]*(-d|--data)[^\n]*(\.env|id_rsa|\.aws|api[_-]?key|token)' '6 exfil POST'
+          check 'bash[[:space:]]+-i.*>&.*dev/tcp|nc[^\n]*[[:space:]]-e[[:space:]]' '7 reverse shell'
+          check 'NOPASSWD' '8 sudoers'
+          check '\.ssh/authorized_keys' '9 authorized_keys'
+          check 'sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}' '10 secretos'
+          check 'ignore[[:space:]]+(previous|prior|above)[[:space:]]+instructions' '11 injection (en)'
+          check 'olvida[[:space:]]+(las|los)[[:space:]]+instrucciones' '11 injection (es)'
+          warn 'git[[:space:]]+push[^\n]*[[:space:]](--force|-f)' '12 git push --force'
+          warn 'chmod[[:space:]]+777|NODE_TLS_REJECT_UNAUTHORIZED=0|InsecureSkipVerify' '13 permiso/insecure'
+          warn 'sudo[[:space:]]+' '14 sudo fuera de seccion de instalacion'
+          if find references -maxdepth 2 \( -name '*.sh' -o -name '*.ps1' -o -name '*.py' \) -print -quit | grep -q .; then
+            echo "::warning::WARN: 15 script adjunto en references/"
+            find references -maxdepth 2 \( -name '*.sh' -o -name '*.ps1' -o -name '*.py' \) -print
+          fi
           exit $FAIL
 
   install-check-windows:
@@ -119,3 +141,84 @@ jobs:
           chmod +x install.sh
           ./install.sh
           ./install.sh --check
+
+  installer-sanity:
+    name: Instaladores — sintaxis + rutas del manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: bash -n install.sh
+        run: bash -n install.sh
+      - name: PowerShell parse sin errores (install.ps1 + scripts/*.ps1)
+        shell: pwsh
+        run: |
+          $files = @("install.ps1") + (Get-ChildItem scripts/*.ps1 | ForEach-Object FullName)
+          foreach ($f in $files) {
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f), [ref]$null, [ref]$errors) | Out-Null
+            if ($errors -and $errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Host $_.Message }
+              throw "Errores de parse en $f"
+            }
+            Write-Host "parse OK: $f"
+          }
+      - name: LOKI_FILES / LOKI_CMD_LIST existen en el repo
+        run: |
+          set -euo pipefail
+          . ./loki.manifest.sh
+          missing=0
+          for f in $LOKI_FILES; do
+            if [ ! -e "$f" ]; then echo "FALTA LOKI_FILES: $f"; missing=1; fi
+          done
+          for c in $LOKI_CMD_LIST; do
+            for d in .claude/commands .opencode/commands; do
+              if [ ! -f "$d/$c.md" ]; then echo "FALTA: $d/$c.md"; missing=1; fi
+            done
+            if [ ! -f ".gemini/commands/$c.toml" ]; then echo "FALTA: .gemini/commands/$c.toml"; missing=1; fi
+          done
+          if [ "$missing" != "0" ]; then echo "ERROR: el manifest declara rutas inexistentes"; exit 1; fi
+          echo "manifest OK"
+
+  scripts-smoke:
+    name: Smoke tests de scripts/*.ps1 (fixtures en tests/)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Copiar fixtures a RUNNER_TEMP (no ensuciar el repo)
+        shell: pwsh
+        run: |
+          $dst = Join-Path $env:RUNNER_TEMP "loki-smoke"
+          Copy-Item -Recurse -Force tests/fixtures $dst
+          "FIXTURES=$dst" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: metrics.ps1 (findings/USD + %T0)
+        shell: pwsh
+        run: |
+          $out = (& .\scripts\metrics.ps1 -RunDir (Join-Path $env:FIXTURES "run")) -join "`n"
+          Write-Host $out
+          if ($out -notmatch 'findings/USD\s+:\s+6') { throw 'metrics: findings/USD esperado 6 (3 findings / $0.5)' }
+          if ($out -notmatch '66\.7%') { throw 'metrics: %T0 esperado 66.7' }
+      - name: score.ps1 (precision/recall/F1 vs groundtruth)
+        shell: pwsh
+        run: |
+          $json = (& .\scripts\score.ps1 -Findings (Join-Path $env:FIXTURES "run\vulnerabilities.json") -GroundTruth references\groundtruth\juice-shop.json) -join "`n"
+          Write-Host $json
+          $r = $json | ConvertFrom-Json
+          if ($r.tp -ne 2) { throw "score: tp esperado 2, obtenido $($r.tp)" }
+          if ($r.fp -ne 1) { throw "score: fp esperado 1, obtenido $($r.fp)" }
+          if ($r.f1 -le 0) { throw "score: f1 debe ser > 0" }
+      - name: delta.ps1 (new/fixed/unchanged)
+        shell: pwsh
+        run: |
+          $json = (& .\scripts\delta.ps1 -Prev (Join-Path $env:FIXTURES "run\vulnerabilities-prev.json") -Curr (Join-Path $env:FIXTURES "run\vulnerabilities.json")) -join "`n"
+          Write-Host $json
+          $r = $json | ConvertFrom-Json
+          if ($r.new.Count -ne 2) { throw "delta: new esperado 2, obtenido $($r.new.Count)" }
+          if ($r.fixed.Count -ne 1) { throw "delta: fixed esperado 1, obtenido $($r.fixed.Count)" }
+          if ($r.unchanged -ne 1) { throw "delta: unchanged esperado 1, obtenido $($r.unchanged)" }
+      - name: digest-sarif.ps1 (SARIF -> digest)
+        shell: pwsh
+        run: |
+          $json = (& .\scripts\digest-sarif.ps1 -Sarif (Join-Path $env:FIXTURES "sample.sarif")) -join "`n"
+          Write-Host $json
+          $r = $json | ConvertFrom-Json
+          if (@($r)[0].rule -ne 'FIX001') { throw "digest: rule esperada FIX001, obtenida $(@($r)[0].rule)" }

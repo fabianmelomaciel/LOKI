@@ -14,6 +14,7 @@ for arg in "$@"; do
         --check) MODE="check" ;;
         --uninstall) MODE="uninstall" ;;
         opencode|claude|gemini|all) TARGET="$arg" ;;
+        *) echo "ERROR: argumento desconocido: $arg (uso: ./install.sh [opencode|claude|gemini|all] | --check | --uninstall)" >&2; exit 2 ;;
     esac
 done
 
@@ -57,14 +58,21 @@ hash256() {
 
 install_skill() {
     local dest_root="$1"
-    mkdir -p "$dest_root"
     local dest="$dest_root/$SKILL_NAME"
+    local f
+    # Preflight: TODO archivo del manifest debe existir ANTES de borrar la instalación previa
+    # (antes se ignoraba en silencio y quedaba una instalación parcial sin aviso).
+    for f in $FILE_LIST; do
+        if [ ! -e "$SRC/$f" ]; then
+            echo "ERROR: LOKI_FILES declara '$f' pero no existe en $SRC — ver loki.manifest.sh (nada se instaló ni se borró)" >&2
+            exit 1
+        fi
+    done
+    mkdir -p "$dest_root"
     rm -rf "$dest"
     mkdir -p "$dest"
     for f in $FILE_LIST; do
-        if [ -e "$SRC/$f" ]; then
-            cp -r "$SRC/$f" "$dest/$f"
-        fi
+        cp -r "$SRC/$f" "$dest/$f"
     done
     # CODEX.md NO se copia (local-only)
     echo "  OK -> $dest  (v$SKILL_VERSION)"
@@ -80,6 +88,11 @@ check_skill() {
     fi
     for f in $FILE_LIST; do
         if [ -d "$SRC/$f" ]; then
+            # IFS=newline: los nombres con espacios no deben partirse (antes cada ruta
+            # con un espacio generaba DRIFT falso o la saltaba).
+            local IFS_SAVE="$IFS"
+            IFS='
+'
             for path in $(cd "$SRC/$f" && find . -type f | sort); do
                 rel="${path#./}"
                 if [ ! -f "$dest/$f/$rel" ]; then
@@ -96,6 +109,7 @@ check_skill() {
                     fi
                 done
             fi
+            IFS="$IFS_SAVE"
         elif [ -f "$SRC/$f" ]; then
             if [ ! -f "$dest/$f" ]; then
                 echo "  [DRIFT] falta: $f"; drift=1

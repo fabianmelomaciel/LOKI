@@ -16,17 +16,19 @@ Escaneo de patrones peligrosos ANTES de delegar o cargar una skill ajena (SkillG
 | 2 | `wget[^\n]*\|\s*(ba)?sh` | BLOQUEO |
 | 3 | `eval\s*\(?\s*['\"]?base64\|FromBase64String\|IEX\s*\(` | BLOQUEO |
 | 4 | `rm\s+-r[f]?\s+(/~\|\$HOME\|/etc)` | BLOQUEO |
-| 5 | `allowed-tools:.*Bash\((\*\|rm\|sudo\|sh)` | BLOQUEO |
+| 5 | `allowed-tools:.*Bash\((\*\|rm\|sudo\|sh)([[:space:]]\|\)\|$)` + su forma de lista `^[[:space:]]*-[[:space:]]+Bash\(…` con el mismo límite de palabra (sin él, `Bash(sha256sum *)` chocaría con el prefijo `sh`) | BLOQUEO |
 | 6 | `curl[^\n]*(-d\|--data)[^\n]*(\.env\|id_rsa\|\.aws\|api[_-]?key\|token)` (exfil POST) | BLOQUEO |
 | 7 | `bash\s+-i\s+>&\s*/dev/tcp\|nc\s+[^\n]*\s-e\s` (reverse shell) | BLOQUEO |
 | 8 | `NOPASSWD\|visudo` | BLOQUEO |
 | 9 | `\.ssh/authorized_keys` (escritura) | BLOQUEO |
 | 10 | `sk-[A-Za-z0-9]{20,}\|AKIA[0-9A-Z]{16}\|ghp_[A-Za-z0-9]{36}` (secretos hardcodeados) | BLOQUEO |
-| 11 | `ignore\s+(previous\|prior\|above)\s+instructions\|olvida\s+(las\|las\s+instrucciones)` (marcador de injection) | BLOQUEO |
+| 11 | `ignore\s+(previous\|prior\|above)\s+instructions\|olvida\s+(las\|los)\s+instrucciones` (marcador de injection, EN + ES) | BLOQUEO |
 | 12 | `git\s+push[^\n]*\s(--force\|-f)\b` | WARN |
 | 13 | `chmod\s+777\|NODE_TLS_REJECT_UNAUTHORIZED=0\|InsecureSkipVerify` | WARN |
 | 14 | `sudo\s+` fuera de sección de instalación declarada | WARN |
 | 15 | Script adjunto ejecutable (`.sh`/`.ps1`/`.py`) en el directorio de la skill | WARN (×3 — dato 2.12x) |
+
+**Implementación en CI:** el job `skill-lint` de `.github/workflows/ci.yml` ejecuta estos 15 patrones sobre 20 archivos — `SKILL.md`, `references/*.md` (este catálogo se auto-excluye: contiene los literales), wrappers de `.claude/`, `.opencode/` y `.gemini/`, `install.sh`, `install.ps1` y `loki.manifest.sh`. BLOQUEO = `exit 1`; WARN = `::warning::` sin fallar. Al cambiar una fila de esta tabla, cambiar también el job (doble fuente controlada: la misma regex vive en ambos lugares y el pre-check local de patrones debe dar 0 HIT sobre ese alcance antes de commitear).
 
 ## Scoring y salida
 

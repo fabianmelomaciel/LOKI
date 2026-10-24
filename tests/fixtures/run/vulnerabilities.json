@@ -1,0 +1,37 @@
+{
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "SQL Injection en login",
+      "cwe": "CWE-89",
+      "severity": "critical",
+      "tier": "t0-passive",
+      "status": "confirmed",
+      "endpoint": "/rest/user/login",
+      "file": "routes/login.ts",
+      "line": 42
+    },
+    {
+      "id": "F-002",
+      "title": "XSS reflejado en busqueda de productos",
+      "cwe": "CWE-79",
+      "severity": "high",
+      "tier": "t0-active",
+      "status": "confirmed",
+      "endpoint": "/rest/products/search",
+      "file": "routes/search.ts",
+      "line": 17
+    },
+    {
+      "id": "F-003",
+      "title": "Path traversal en descarga",
+      "cwe": "CWE-22",
+      "severity": "medium",
+      "tier": "t1",
+      "status": "confirmed",
+      "endpoint": "/download",
+      "file": "routes/download.ts",
+      "line": 8
+    }
+  ]
+}

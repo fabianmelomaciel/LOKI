@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "mode": "quick",
+  "started_at": "2026-10-24T00:00:00.000Z",
+  "wall_clock_s": 42,
+  "targets": ["fixture.local"],
+  "repo_count": 1,
+  "is_multi_repo": false,
+  "budget": { "cap_usd": 1.0 },
+  "llm_usage": { "cost_usd": 0.5, "input_tokens": 1000, "output_tokens": 500 },
+  "evidence_hashes": ["3f2a9c8b1d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8"]
+}

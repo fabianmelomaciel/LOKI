@@ -3,7 +3,7 @@
 **El agente de pentesting y auditoría de seguridad que corre dentro de tu IDE de IA — no al lado.**
 
 [![CI](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml/badge.svg)](https://github.com/fabianmelomaciel/LOKI/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/versión-1.11.0-black.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/versión-1.12.0-black.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Authorized use only](https://img.shields.io/badge/uso-solo%20autorizado-critical)](docs/normas/LEGALES.md)
 [![Skill format](https://img.shields.io/badge/formato-SKILL.md-informational)](SKILL.md)
@@ -167,6 +167,7 @@ Reglas absolutas: sin exploit no hay report, cero DoS, cero fuerza bruta de cred
 ├── install.ps1 / install.sh      # -Check / -Uninstall
 ├── loki.manifest.sh                # fuente única de versión + lista de archivos (ambos instaladores la leen)
 ├── SECURITY.md                    # divulgación responsable
+├── tests/fixtures/                 # fixtures JSON/SARIF de los smoke tests de CI (no se instalan)
 └── reports/                        # salida por corrida (gitignored salvo ejemplo)
 ```
 

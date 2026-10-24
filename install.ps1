@@ -19,6 +19,10 @@ $ErrorActionPreference = "Stop"
 $Src = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillName = "loki"
 
+if ($Target -notin @("all", "opencode", "claude", "gemini")) {
+    throw "Target invalido: '$Target' (uso: -Target all|opencode|claude|gemini [-Check|-Uninstall])"
+}
+
 # Fuente única de versión + lista de archivos (sync con install.sh) — ver loki.manifest.sh
 $ManifestPath = Join-Path $Src "loki.manifest.sh"
 $ManifestContent = Get-Content $ManifestPath -Raw
@@ -61,10 +65,17 @@ function Get-FileHash256($path) {
 }
 
 function Install-Skill($DestRoot) {
+    $Dest = Join-Path $DestRoot $SkillName
+    # Preflight: TODO archivo del manifest debe existir ANTES de borrar la instalacion previa
+    # (antes se ignoraba en silencio y quedaba una instalacion parcial sin aviso).
+    foreach ($f in $FileList) {
+        if (-not (Test-Path (Join-Path $Src $f))) {
+            throw "LOKI_FILES declara '$f' pero no existe en $Src — ver loki.manifest.sh (nada se instaló ni se borró)"
+        }
+    }
     if (-not (Test-Path $DestRoot)) {
         New-Item -ItemType Directory -Path $DestRoot -Force | Out-Null
     }
-    $Dest = Join-Path $DestRoot $SkillName
     if (Test-Path $Dest) {
         Remove-Item -Recurse -Force $Dest
     }
@@ -72,9 +83,7 @@ function Install-Skill($DestRoot) {
 
     foreach ($f in $FileList) {
         $srcPath = Join-Path $Src $f
-        if (Test-Path $srcPath) {
-            Copy-Item $srcPath (Join-Path $Dest $f) -Recurse -Force
-        }
+        Copy-Item $srcPath (Join-Path $Dest $f) -Recurse -Force
     }
     # CODEX.md NO se copia (local-only / puede contener rutas internas)
     Write-Output ("  OK -> " + $Dest + "  (v" + $SkillVersion + ")")

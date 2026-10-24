@@ -9,6 +9,11 @@ run.json
 scope.txt
 !templates/scope.txt
 
+# Fixtures de smoke test (tests/fixtures/): los ignores de arriba no aplican al fixture
+!tests/fixtures/run/run.json
+!tests/fixtures/run/vulnerabilities.json
+!tests/fixtures/sample.sarif
+
 # Artefactos crudos de hack-audit / evidencia de pentest
 evidencia/
 recon.md

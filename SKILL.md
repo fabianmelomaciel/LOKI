@@ -1,6 +1,6 @@
 ---
 name: loki
-version: 1.11.0
+version: 1.12.0
 description: >
   Loki — la skill maestra de pentesting y auditoría más eficiente: orquesta
   análisis estático gratuito (T0-pasivo), escaneos activos con gates (T0-activo),
@@ -22,7 +22,13 @@ allowed-tools:
   - Write
   # Pasivos / utilidades (siempre tras Gates A+B+E)
   - Bash(npm audit *)
-  - Bash(git *)
+  # git SOLO subcomandos de lectura (Gate B: sin push/reset/clean/checkout/restore). Se listan por subcomando porque el permission layer no admite negación.
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git log *)
+  - Bash(git show *)
+  - Bash(git grep *)
+  - Bash(git rev-parse *)
   - Bash(semgrep *)
   - Bash(trivy *)
   - Bash(gitleaks *)
@@ -32,6 +38,7 @@ allowed-tools:
   - Bash(safety *)
   - Bash(which *)
   - Bash(uname *)
+  # find: SOLO formas read-only (contar archivos con exclusiones — `references/multi-repo-guard.md` §4). Gate B prohíbe `-delete`/`-exec`/`-ok`; el permission layer no puede negar flags (mismo caso que `Bash(curl *)`), así que la prosa manda y cualquier uso fuera de esas formas se reporta.
   - Bash(find *)
   - Bash(sha256sum *)
   - Bash(curl -I *)

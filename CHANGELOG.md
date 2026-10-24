@@ -2,6 +2,25 @@
 
 Todas las versiones notables de Loki. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [1.12.0] — 2026-10-24
+
+Endurecimiento de permisos, CI completo y robustez de los instaladores. Deliberación `agente-ideas` sobre el snapshot v1.11.0 (consejo degradado: sin subagentes con lectura local, síntesis del Chairman; ranking 1º seguridad / 2º FinOps / 3º simplicidad; CEO aprobó P1–P6).
+
+### Added
+- **Job `installer-sanity` en CI**: `bash -n install.sh`, parse sin errores de `install.ps1` + `scripts/*.ps1` y validación de que todas las rutas declaradas en `LOKI_FILES`/`LOKI_CMD_LIST` existan en el repo (antes solo se comparaban las listas de tools entre instaladores).
+- **Job `scripts-smoke` en CI**: asserts de `metrics.ps1` (findings/USD, %T0), `score.ps1` (tp/fp/f1 contra ground truth), `delta.ps1` (new/fixed/unchanged) y `digest-sarif.ps1`, sobre fixtures en `tests/fixtures/` (fuera de `LOKI_FILES`, no se instalan).
+- **Los 15 patrones de `references/skill-lint.md` quedan implementados en CI**: se agregan #5 (`allowed-tools` peligrosos), #6 (exfil POST), #11 en español y los WARN #12–#15 (no fatales); el catálogo se auto-excluye del lint.
+
+### Changed
+- **`allowed-tools` de SKILL.md acotado**: `Bash(git *)` → subcomandos de solo lectura (`status`/`diff`/`log`/`show`/`grep`/`rev-parse`); para `find` queda documentado el uso read-only de Gate B, porque el permission layer no admite negación de flags (mismo caso que `Bash(curl *)`).
+- **Alcance del skill-lint ampliado de 2 a 20 archivos**: wrappers `.claude/`/`.opencode/`/`.gemini/`, `install.sh`, `install.ps1` y `loki.manifest.sh`, además de `SKILL.md` y `references/*.md`.
+- `version` 1.11.0 → 1.12.0 (manifest, frontmatter y badge, validado por CI).
+
+### Fixed
+- **Instalación parcial silenciosa en ambos instaladores**: si un archivo de `LOKI_FILES` falta en el repo, el preflight aborta **antes** de borrar la instalación previa (antes se copiaba solo lo disponible y `-Check` tampoco lo reportaba).
+- **`install.sh`**: un argumento desconocido (p. ej. `--Check`) ahora sale con código 2 y mensaje de uso — antes se ignoraba y ejecutaba la instalación real; las rutas con espacios ya no generan DRIFT falso en `-Check` (`IFS` de newline en los `find` de comparación).
+- **`install.ps1`**: `-Target` inválido ahora lanza error — antes terminaba con «Instalado» sin haber instalado nada.
+
 ## [1.11.0] — 2026-10-22
 
 Mejora incremental de los auditores de seguridad. Deliberación `agente-ideas` (consejo A/B/C, Stage 2 por veto de seguridad de B: Consensys sin licencia, cadena de suministro sin pin y armamento ofensivo). Se adaptó **solo método reescrito** de Claude-BugHunter, Claude-Red y Anthropic security-review; no se importaron archivos, payloads ni dependencias.
